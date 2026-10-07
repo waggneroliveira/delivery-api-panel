@@ -7,7 +7,7 @@ use App\Models\PlanNetwork;
 use App\Modules\Client\Business\HomePageService;
 use App\Services\ThemeManager;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HomePageController

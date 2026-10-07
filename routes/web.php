@@ -118,6 +118,10 @@ Route::middleware([NeedsTenant::class])->group(function () {
         ->name('send-contact');
 
 
+    Route::get('blog/filter', [HomePageController::class, 'filterBySubCategory'])
+        ->name('blog.filter.subcategory');
+
+
     Route::get('blog/{slug}', [BlogPageController::class, 'blogInner'])
         ->name('blog-inner');
 
@@ -154,10 +158,6 @@ Route::middleware([NeedsTenant::class])->group(function () {
 
     // Route::get('blog/filter/{category?}', [HomePageController::class, 'filterByCategory'])
     //     ->name('blog.filter');
-
-    Route::get('blog/filter', [HomePageController::class, 'filterBySubCategory'])
-        ->name('blog.filter.subcategory');
-
 
     Route::post('/download-ficha/store', [DownloadFichaController::class, 'store'])
         ->name('download.ficha.store');
