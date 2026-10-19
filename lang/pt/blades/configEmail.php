@@ -1,0 +1,27 @@
+<?php
+
+return [
+    "explication_config" => "Para configurar e-mails de outros provedores recomendamos pesquisar no google: Como configurar SMTP hostgator, por exemplo.",
+    "step_to_step_config_gmail_title" => "Configurar conta Gmail",
+    "step_to_step_config_outlook_title" => "Configurar conta Gmail",
+    "step_to_step_config_user" => "Seu endereço completo do Gmail",
+    "step_to_step_config_password" => "Sua senha de app. Não sabe como configurar? ",
+    "password_outlook" => "Senha do email",
+    "host" => "Host", 
+    "user" => "Usuário",  
+    "email" => "E-mail",                  
+    "password" => "Senha",
+    "port" => "Porta",
+    "protocol" => "Protocolo",
+    "encryption" => "Criptografia",
+    "sender_email" => "E-mail remetente",
+    "email_identifier" => "Identificador do e-mail",
+    "text_password" => "Sua senha não ficará visível por questões de segurança.", 
+    "btn_conection_test" => "Testar conexão", 
+    "message_conection_smtp_success" => "Conexão estabelecida com sucesso!",
+    "message_conection_smtp_error" => "Erro ao estabelecer conexão!",
+    "message_conection_smtp_reason" => "Confira detalhes do erro abaixo.",
+    "message_for_email_one" => "Olá, Este e-mail é um teste automático para validar a conexão do seu site",
+    "message_for_email_thwo" => "com o servidor SMTP. Caso tenha recebido esta mensagem, a conexão foi estabelecida com sucesso. Se não foi você quem solicitou este teste, ignore este e-mail.",
+    "subject_test_conection_smtp" => "Teste de conexão SMTP",
+];

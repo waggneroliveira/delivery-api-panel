@@ -1,0 +1,27 @@
+<?php
+
+return [
+    "explication_config" => " To configure emails from other providers, we recommend searching on Google: How to configure SMTP HostGator, for example.",
+    "step_to_step_config_gmail_title" => "Set up Gmail account",       
+    "step_to_step_config_outlook_title" => "Set up Outlook account",    
+    "step_to_step_config_user" => "Your full Gmail address",           
+    "step_to_step_config_password" => "Your app password. Don’t know how to set it up? ", 
+    "password_outlook" => "Email Password",
+    "host" => "Host",           
+    "user" => "User",    
+    "email" => "Email",                       
+    "password" => "Password",     
+    "port" => "Port",    
+    "protocol" => "Protocol",                          
+    "encryption" => "Encryption",                      
+    "sender_email" => "Sender Email",                  
+    "email_identifier" => "Email Identifier",
+    "text_password" => "Your password will not be visible for security reasons.", 
+    "btn_conection_test" => "Test Connection",    
+    "message_conection_smtp_success" => "Connection established successfully!",     
+    "message_conection_smtp_error" => "Error establishing connection!",
+    "message_conection_smtp_reason" => "Check the details of the error below.",
+    "message_for_email_one" => "Hello, this email is an automatic test to validate the connection of your website.",
+    "message_for_email_thwo" => "with the SMTP server. If you received this message, the connection was successfully established. If you did not request this test, please ignore this email.",
+    "subject_test_conection_smtp" => "SMTP Connection Test",
+];
