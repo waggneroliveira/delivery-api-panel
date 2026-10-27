@@ -104,7 +104,13 @@ class ThemeManager
      */
     public function core(string $view): string
     {
-        return "client.themes.{$this->current()}.{$this->variation()}.core.{$view}";
+        $core = "client.themes.{$this->current()}.{$this->variation()}.core.{$view}";
+
+        if (app('view')->exists($core)) {
+            return $core;
+        }
+
+        return "client.themes.default.error.core.{$view}";
     }
 
     /**

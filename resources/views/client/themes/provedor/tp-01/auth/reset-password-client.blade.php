@@ -1,4 +1,5 @@
-@extends('client.core.client')
+@php($themeManager = app(\App\Services\ThemeManager::class))
+@extends($themeManager->core('client'))
 @section('content')
 <div class="authentication-bg authentication-bg-pattern">
     <style>
