@@ -427,99 +427,72 @@ PREVIEWS DO TEMPLATE
         }, 250);
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+        window.templatePreviewInitialized = window.templatePreviewInitialized || false;
 
-        document
-            .querySelectorAll('.template-preview-input')
-            .forEach(function (input) {
+        function initializeTemplatePreviews() {
+            if (window.templatePreviewInitialized) {
+                return;
+            }
 
-                input.addEventListener('change', function () {
+            window.templatePreviewInitialized = true;
 
-                    const previewContainer = input
-                        .closest('.col-12')
-                        .querySelector('.template-preview-new');
+            document
+                .querySelectorAll('.template-preview-input')
+                .forEach(function (input) {
+                    input.addEventListener('change', function () {
+                        const previewContainer = input
+                            .closest('.col-12')
+                            ?.querySelector('.template-preview-new');
 
-                    if (!previewContainer) {
-                        return;
-                    }
-
-                    previewContainer.innerHTML = '';
-
-
-                    Array.from(input.files).forEach(function (file) {
-
-                        if (!file.type.startsWith('image/')) {
+                        if (!previewContainer) {
                             return;
                         }
 
+                        previewContainer.replaceChildren();
 
-                        const reader = new FileReader();
+                        Array.from(input.files).forEach(function (file) {
+                            if (!file.type.startsWith('image/')) {
+                                return;
+                            }
 
+                            const reader = new FileReader();
 
-                        reader.onload = function (event) {
-
-                            const col = document.createElement('div');
-
-                            col.className =
-                                'col-12 col-sm-6 col-md-4 col-lg-3';
-
-
-                            col.innerHTML = `
-                                <div class="card border shadow-sm overflow-hidden">
-
-                                    <div
-                                        class="position-relative"
-                                        style="
-                                            height: 220px;
-                                            background: #f8f9fa;
-                                        "
-                                    >
-
-                                        <img
-                                            src="${event.target.result}"
-                                            class="w-100 h-100"
-                                            style="
-                                                object-fit: cover;
-                                                object-position: top;
-                                            "
-                                        >
-
-                                        <span
-                                            class="badge bg-success position-absolute top-0 start-0 m-2"
-                                        >
-                                            Nova
-                                        </span>
-
+                            reader.onload = function (event) {
+                                const col = document.createElement('div');
+                                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+                                col.innerHTML = `
+                                    <div class="card border shadow-sm overflow-hidden">
+                                        <div class="position-relative" style="height: 220px; background: #f8f9fa;">
+                                            <img
+                                                src="${event.target.result}"
+                                                class="w-100 h-100"
+                                                style="object-fit: cover; object-position: top;"
+                                                alt="Prévia de ${file.name.replace(/["<>]/g, '')}"
+                                            >
+                                            <span class="badge bg-success position-absolute top-0 start-0 m-2">Nova</span>
+                                        </div>
+                                        <div class="card-body p-2">
+                                            <small class="text-muted text-truncate d-block"></small>
+                                        </div>
                                     </div>
+                                `;
+                                col.querySelector('small').textContent = file.name;
+                                previewContainer.appendChild(col);
+                            };
 
-                                    <div class="card-body p-2">
-
-                                        <small
-                                            class="text-muted text-truncate d-block"
-                                        >
-                                            ${file.name}
-                                        </small>
-
-                                    </div>
-
-                                </div>
-                            `;
-
-
-                            previewContainer.appendChild(col);
-
-                        };
-
-
-                        reader.readAsDataURL(file);
-
+                            reader.readAsDataURL(file);
+                        });
                     });
-
                 });
+        }
 
-            });
-
-    });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeTemplatePreviews);
+        } else {
+            initializeTemplatePreviews();
+        }
+    })();
 </script>
 
 <style>

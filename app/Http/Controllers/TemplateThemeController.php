@@ -101,7 +101,7 @@ class TemplateThemeController extends Controller
                 }
             }
 
-            $data['preview'] = $preview;
+            $data['preview'] = array_values(array_unique($preview));
             $data['slug'] = Str::slug($request->name);
 
             /*
@@ -174,6 +174,8 @@ class TemplateThemeController extends Controller
             if (!is_array($preview)) {
                 $preview = [];
             }
+
+            $preview = array_values(array_unique($preview));
 
             /*
             |--------------------------------------------------------------------------
@@ -275,7 +277,7 @@ class TemplateThemeController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $data['preview'] = array_values($preview);
+            $data['preview'] = array_values(array_unique($preview));
 
             /*
             |--------------------------------------------------------------------------
