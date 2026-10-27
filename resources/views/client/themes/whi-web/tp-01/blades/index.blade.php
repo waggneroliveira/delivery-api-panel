@@ -212,8 +212,8 @@
                             </div>
   
                             <!-- CARDS FLUTUANTES COM EFEITO DE HOVER/FLUTUAÇÃO (Skins Flutuantes da Imagem) -->
-                            <div class="floating-badge badge-seo shadow-lg animate-float-1">
-                                <div class="icon-wrap bg-primary-soft d-none d-lg-block">
+                            <div class="floating-badge badge-seo shadow-lg animate-float-1 d-none d-lg-flex">
+                                <div class="icon-wrap bg-primary-soft">
                                     <i class="bi bi-rocket-takeoff-fill text-primary font-22"></i>
                                 </div>
                                 <div class="text-start">
@@ -222,8 +222,8 @@
                                 </div>
                             </div>
   
-                            <div class="floating-badge badge-templates shadow-lg animate-float-2">
-                                <div class="icon-wrap bg-primary-soft d-none d-lg-block">
+                            <div class="floating-badge badge-templates shadow-lg animate-float-2 d-none d-lg-flex">
+                                <div class="icon-wrap bg-primary-soft">
                                     <i class="bi bi-bar-chart-line-fill text-primary font-22"></i>
                                 </div>
                                 <div class="text-start">
@@ -232,8 +232,8 @@
                                 </div>
                             </div>
   
-                            <div class="floating-badge badge-audit shadow-lg animate-float-3">
-                                <div class="icon-wrap bg-primary-soft d-none d-lg-block">
+                            <div class="floating-badge badge-audit shadow-lg animate-float-3 d-none d-lg-flex">
+                                <div class="icon-wrap bg-primary-soft">
                                     <i class="bi bi-shield-check text-primary font-22"></i>
                                 </div>
                                 <div class="text-start">
@@ -242,8 +242,8 @@
                                 </div>
                             </div>
   
-                            <div class="floating-badge badge-permissions shadow-lg animate-float-4">
-                                <div class="icon-wrap bg-primary-soft d-none d-lg-block">
+                            <div class="floating-badge badge-permissions shadow-lg animate-float-4 d-none d-lg-flex">
+                                <div class="icon-wrap bg-primary-soft">
                                     <i class="bi bi-people-fill text-primary font-22"></i>
                                 </div>
                                 <div class="text-start">
@@ -342,8 +342,8 @@
             Gerenciamento Multiplataforma <span class="ww-gradient-text">Centralizado</span>
         </h2>
         <p class="ww-intro">
-            Veja a interação simulada entre MacBook, iPhone e Tablet do
-            ecossistema WhiWeb.
+            Veja a interação simulada entre MacBook, iPhone e Tablet da
+            plataforma <b>WhiWeb</b>.
         </p>
     </header>
 
