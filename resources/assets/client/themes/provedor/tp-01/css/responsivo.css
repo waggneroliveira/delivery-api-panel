@@ -1,0 +1,346 @@
+@media (max-width: 991.98px) {
+    .depoiment .content {
+        padding: 20px 0 20px 0;
+    }
+    .topics .montserrat-bold.font-25 {
+        font-size: 1.25rem;
+    }
+
+    .box-topic .description p {
+        font-size: 0.813rem;
+    }
+    .d-flex.justify-content-center.align-items-start.gap-4.flex-column.p-0.mt-5.col-12.col-md-6, .obs.mt-4.col-12.col-md-8 {
+        width: 95%;
+    }
+    .social-links.d-flex.justify-content-between.align-items-center.gap-4.text-center.col-9 {
+        justify-content: flex-end !important;
+    }
+    .none {
+        display: none !important;
+    }
+}
+@media (max-width:885px) {
+    .hero {
+        height: 100%;
+    }
+    .image-hero {
+        aspect-ratio: 195 / 293;
+        object-position: top center;
+    }
+    .client-img {
+        max-width: 120px 
+    }
+}
+@media (max-width:768px) {
+    .plan aside, .products aside {
+        width: 91.66666667%;
+        margin: 0 auto;
+    }
+    .plan .col-12.col-md-7.position-relative, .products .col-12.col-md-7.animate-on-scroll {
+        width: 95%;
+        margin: 0 auto;
+        margin-right: 0;
+    }
+    .announcement {
+        width: 95% !important;
+    }
+    .announcement .swiper-slide {
+        padding: 30px 0 !important;
+    }
+    .announcement .image {
+        max-width: inherit;
+        height: 200px;
+    }
+    .announcement .image img {
+        height: 100%;
+    }
+}
+@media (max-width:630px) {
+    .d-flex.justify-content-between.align-items-center.mt-5 {
+        flex-direction: column;
+        gap: 10px 
+    }
+    .logo {
+        text-align: center 
+    }
+
+    .sitemap, .social-links.d-flex.justify-content-end.gap-4.text-center {
+        justify-content: center !important 
+    }
+    #header {
+        padding: 20px 
+    }
+}
+@media (max-width:576px) {
+    .hero{
+        height: 460px;
+    }
+    .hero .image-hero {
+        aspect-ratio: initial;
+        height: 100%;
+        max-height: 460px;
+    }
+    .menu-mobile nav ul li a, .topics h5 {
+        font-size: 1.125rem !important;
+    }
+    .plan .list ul li, .plan .list p {
+        font-size: 0.813rem !important;
+    }
+    .partner-card img {
+        width: 140px;
+        height: 90px;
+    }
+    #about .container {
+        padding: 0;
+    }
+    .price span {
+        font-size: 1.25rem;
+    }
+    #header .logo-img .img-fluid {
+        max-width: 180px;
+    }
+    .container.m-auto.p-0.d-flex.align-items-center.justify-content-between.flex-row {
+        width: 91.6667%;
+        margin: 0 auto;
+    }
+    .d-flex.justify-content-center.align-items-start.gap-4.flex-column.p-0.mt-5.col-12.col-md-6 {
+        width: 100%;
+    }
+    .about .animate-on-scroll {
+        margin: 0 auto;
+        padding: 0 !important;
+    }
+    .announcement .image img {
+        object-fit: contain;
+    }
+    .rounded-top-left {
+        margin-bottom: 30px !important;
+    }
+    .col-12.col-lg-9.mb-5.pb-4.d-flex.justify-content-between.gap-3.flex-wrap.align-items-center {
+        margin-bottom: 10px !important;
+    }
+    .modal-dialog.modal-dialog-centered {
+        width: 95% !important;
+        margin: 0 auto;
+    }
+    .social-links .carrossel {
+        width: 100%;
+        height: auto;
+        line-height: 14px;
+        text-align: center;
+        font-size: 0.75rem;
+        z-index: -1;
+    }
+    .menu-icon {
+        width: 25px !important;
+        height: 25px !important;
+    }
+    .menu-icon span {
+        height: 2.5px !important;
+    }
+    .bi.bi-box-arrow-right.font-18 {
+        font-size: 0.875rem;
+    }
+    .image-profile {
+        width: 35px;
+        height: 35px;
+    }
+    .login h2, .login h3 {
+        font-size: 0.75rem;
+    }
+    .swiper-button-next:after, .swiper-button-prev:after {
+        font-size: 18px;
+        font-weight: 800;
+    }
+    #all-complete h2 {
+        align-items: center !important;
+    }
+    .social-links.d-flex.justify-content-between.align-items-center.gap-4.text-center.col-9 {
+        padding-right: 5px;
+        width: auto;
+    }
+    .hero h1{
+        font-size: 1.75rem;
+    }
+}
+@media (max-width:476px) {
+    .form-check-label.montserrat-regular.font-15 {
+        font-size: 0.875rem;
+    }
+    .logo {
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    .topics .montserrat-bold.font-25, .about h1, .plan h2, .products h2, .depoiment h2, #all-complete h2, .contact-section h2 {
+        font-size: 1.125rem;
+    }
+    .plan h3, .products h3 {
+        font-size: 1.75rem;
+    }
+    .contact-section .animate-on-scroll {
+        margin: 0 auto;
+    }
+    .d-flex.flex-column.col-10.comment {
+        width: 80%;
+    }
+    .text-color.mb-0.montserrat-regular.font-12 {
+        font-size: 0.625rem;
+    }
+    .footer .container {
+        padding-bottom: 35px !important;
+        padding-top: 35px !important;
+    }
+    .sitemap .logo img {
+        max-width: 280px;
+    }
+    .login .loginOn {
+        font-size: 0.563rem;
+    }
+    .social-links.d-flex.justify-content-between.align-items-center.gap-4.text-center.col-9 {
+        padding-right: 15px;
+    }
+    .d-flex.justify-content-start.align-items-center.gap-2.text-decoration-none.lh-0, .nav-link.waves-effect.waves-light {
+        width: inherit;
+        height: inherit;
+    }
+    .d-flex.justify-content-between.align-items-center.mt-5 p {
+        text-align: center !important;
+    }
+    .d-flex.justify-content-end.flex-column.w-auto.montserrat-semiBold span a {
+        align-items: flex-start;
+        margin: 0 auto;
+        text-align: left;
+        font-size: 0.75rem;
+    }
+    .d-flex.justify-content-end.flex-column.w-auto.montserrat-semiBold span a svg {
+        width: 30px;
+    }
+    .d-flex.justify-content-end.flex-column.w-auto.montserrat-semiBold {
+        text-align: center;
+        align-items: center;
+    }
+    .footer ul {
+        text-align: center !important;
+    }
+    .site-navigation.position-relative.text-end.w-25.redes-sociais, .p-0.d-flex.justify-content-start.gap-5.flex-row.mb-0 {
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 35px !important;
+    }
+    .dark-background.rounded-3.px-5.py-4 {
+        padding: 20px 11px !important;
+    }
+    .dark-background.rounded-3.px-5.py-4 {
+        width: 95%;
+    }
+    .sc {
+        width: 100%;
+    }
+    .sitemap {
+        margin-bottom: 35px !important;
+    }
+    .credits img {
+        width: 85px;
+    }
+    .socials-network {
+        height: 200px;
+        padding-top: 0 !important;
+        gap: 0px;
+    }
+    aside .img-fluid.annun {
+        width: 100% !important;
+    }
+    #commentForm button, .montserrat-semiBold.font-16.d-flex.justify-content-between.align-items-center.gap-2.background-red.py-2.px-3.text-white.rounded-3 {
+        padding: 5px 10px;
+    }
+    .bg-white.border.border-top-0.p-4 {
+        padding: 10px !important;
+    }
+    .announcement .image {
+        max-width: inherit;
+        height: 110px;
+        max-height: inherit;
+    }
+    .container-fluid {
+        padding: 0 !important;
+    }
+    .montserrat-bold.font-28.mt-5.title-blue {
+        margin-top: 25px !important;
+    }
+    .section-title.rounded-top-left.rounded-3.d-flex.justify-content-between.align-items-center.h-100 svg {
+        width: 20px;
+    }
+    .btn.px-4.background-red.rounded-3.text-white.montserrat-medium.font-15, .btn.bg-secondary.rounded-3.text-white.montserrat-medium.font-15, .btn.px-5.background-red.rounded-3.text-white.montserrat-medium.font-15 {
+        padding: 5px 15px;
+        font-size: 0.75rem;
+    }
+    .m-0.text-uppercase.montserrat-bold.font-22.title-blue, .mb-3.title-blue.montserrat-bold.font-32.text-uppercase, .montserrat-bold.font-30.mb-2.title-blue, .montserrat-bold.font-28.mt-5.title-blue, .montserrat-bold.font-30.mb-0.title-blue, .modal-title.text-uppercase.montserrat-bold.font-22.text-white {
+        font-size: 1.125rem;
+    }
+    .badge.badge-primary.montserrat-semiBold.font-12.me-2.background-red.text-uppercase.font-weight-semi-bold.p-2, .badge.background-red.montserrat-semiBold.font-12.text-uppercase.py-2.px-2.me-2 {
+        font-size: 0.625rem;
+    }
+    .h6.m-0.text-uppercase.montserrat-bold.font-14.title-blue, .btn.btn-sm.btn-outline-secondary.montserrat-semiBold.font-14.m-1, .mb-1.montserrat-bold.font-15.title-blue.text-uppercase, .text-muted.text-color.montserrat-regular.font-16.title-blu, .montserrat-regular.font-15.text-white.text-center {
+        font-size: 0.75rem;
+    }
+    #news {
+        padding-top: 0px !important;
+    }
+    .h2.m-0.text-white.text-uppercase.montserrat-bold.font-32.d-block, .m-0.text-uppercase.montserrat-bold.font-25.title-blue {
+        font-size: 1.125rem;
+    }
+    .h6.m-0.text-white.text-uppercase.montserrat-bold.font-16.d-block, .h4.d-block.mb-3.text-uppercase.montserrat-semiBold.font-20.title-blue, .m-0.text-color.montserrat-regular.font-16, .text-color.montserrat-regular.font-16.text-start, .text-blog-inner.montserrat-regular.font-16 p, .montserrat-semiBold.font-16.d-flex.justify-content-between.align-items-center.gap-2.background-red.py-2.px-3.text-white.rounded-3, #commentForm button, #contactForm button {
+        font-size: 0.938rem;
+    }
+    .montserrat-regular.text-color.font-12 {
+        text-align: left;
+    }
+    #footer-text {
+        font-size: 0.75rem;
+    }
+    #newsletterForm .input-group-append, #contactForm button {
+        margin: 0 auto;
+        margin-right: 0;
+        margin-top: 10px;
+    }
+    #contactForm button {
+        padding: 5px 10px;
+    }
+    .contact .description {
+        width: 75%;
+    }
+    #newsletterForm .input-group-append button {
+        padding: 5px;
+    }
+    .form-control.form-control-lg.montserrat-regular.text-color.font-14 {
+        width: 100%;
+        border-radius: 5px !important;
+    }
+    .hero .description {
+        top: 170px;
+        margin-top: 0 
+    }
+    .client-img {
+        max-width: 90px;
+    }
+    .social-links a {
+        width: 30px;
+        height: 30px;
+        font-size: .938rem;
+    }
+    .logo-img {
+        padding: 0 !important;
+        width: 220px;
+    }
+    .hero h1, .hero p {
+        margin-bottom: 20px !important;
+    }
+}
+@media (max-width:414px) {
+    .h6.m-0.text-uppercase.montserrat-bold.font-14.title-blue {
+        font-size: 0.625rem;
+    }
+    .badge.badge-primary.montserrat-semiBold.font-10.text-uppercase.py-1.px-2.background-red {
+        font-size: 0.5rem;
+    }
+}
