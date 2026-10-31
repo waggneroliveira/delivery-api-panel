@@ -369,6 +369,8 @@ return [
                     'faq_session',
                     'faq',
                     'statute',
+                    'contact',
+                    'contact_leads',
                 ],
             ],
 

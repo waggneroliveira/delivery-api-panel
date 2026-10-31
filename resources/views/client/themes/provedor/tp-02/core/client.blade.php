@@ -286,7 +286,8 @@
 
     <link href="{{ asset('build/client/themes/provedor/tp-02/css/style.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('build/client/css/default.css') }}" rel="stylesheet" type="text/css">
-
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     {{-- ============================================================
     SCHEMA.ORG
@@ -304,10 +305,10 @@
 
     @include('client/themes/provedor/tp-02/includes/lgpd/lgpd')
 
-    @if (isset($contact) && $contact->phone_one <> null)
+    @if (isset($contact) && $contact->whatsapp <> null)
         @php
             // Remove caracteres não numéricos do telefone
-            $phone = preg_replace('/\D/', '', $contact->phone_one);
+            $phone = preg_replace('/\D/', '', $contact->whatsapp);
 
             // Monta mensagem com ícones e quebras de linha
             $mensagem = "Olá! Encontrei seu site e gostaria de conhecer mais sobre os planos disponíveis.%0A";
@@ -315,7 +316,7 @@
 
         <a href="https://wa.me/55{{ $phone }}?text={{ $mensagem }}"
         class="whatsapp-floatt" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp">
-            <i class="bi bi-whatsapp"></i>
+            <i class="bi bi-whatsapp accent-color"></i>
         </a>
     @endif
 
@@ -459,7 +460,7 @@
     </style>
 
     <header class="shadow-sm bg-header">
-        <nav class="navbar navbar-expand-lg navbar-light container py-2 px-3 px-lg-0">            
+        <nav class="navbar navbar-expand-lg navbar-dark container py-2 px-3 px-lg-0">            
             <!-- Logo -->
             @php
                 $logoPath = storage_path('app/public/' . $tenantTheme->path_image_logo_header);
@@ -487,7 +488,7 @@
                         <a class="nav-link font-changa font-16 font-semibold font-header text-color-header" href="{{route('index')}}#services">Serviços</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link font-changa font-16 font-semibold font-header text-color-header" href="{{ request()->routeIs('index') ? '#depoiment' : route('index') . '#depoiment' }}">Depoimentos</a>
+                        <a class="nav-link font-changa font-16 font-semibold font-header text-color-header" href="{{ request()->routeIs('index') ? '#benefit' : route('index') . '#benefit' }}">Benefícios</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link font-changa font-16 font-semibold font-header text-color-header" href="{{route('index')}}#faq">FAQ</a>
@@ -500,7 +501,7 @@
                 <!-- Botão -->
                 @if (isset($tenantTheme->link_header) && $tenantTheme->link_header <> null)                        
                     <div class="d-flex justify-content-center gap-2 align-items-center btn-header bg-button-one py-2 px-4 hover-zoom rounded-pill">                        
-                        <a href="{{$tenantTheme->link_header}}" target="_blank" class="font-changa font-15 font-medium text-decoration-none color-button-one">
+                        <a href="{{$tenantTheme->link_header}}" target="_blank" class="font-changa font-15 font-semibold text-decoration-none color-button-one">
                             {{$tenantTheme->btn_title_header}}
                         </a>
                         
@@ -529,7 +530,7 @@
                         $logoPath = storage_path('app/public/' . $tenantTheme->path_image_logo_footer);
                         $dimensions = file_exists($logoPath) ? @getimagesize($logoPath) : null;
                     @endphp
-                    <img loading="lazy" src="{{asset('storage/' .$tenantTheme->path_image_logo_footer)}}" alt="{{ $tenantTheme->name }}" width="{{ $dimensions[0] ?? 200 }}" height="{{ $dimensions[1] ?? 60 }}" style="max-width:100%;height:auto;">
+                    <img loading="lazy" src="{{asset('storage/' .$tenantTheme->path_image_logo_footer)}}" alt="{{ $tenantTheme->name }}" width="{{ $dimensions[0] ?? 200 }}" height="{{ $dimensions[1] ?? 60 }}" style="max-width:250px;height:auto;">
                     @if ($tenantTheme->link <> null)                        
                         <div class="mt-3 mt-lg-5">
                             <a href="{{ $tenantTheme->link }}" target="_blank" rel="noopener noreferrer" class="bg-button-two color-button-two px-4 py-2 font-changa font-16 font-medium text-decoration-none hover-zoom">
@@ -544,7 +545,7 @@
                 <div class="col-lg-6 mb-4 mb-0">
                     <div class="font-changa text-color-footer font-16 font-bold mb-3 position-relative d-inline-block font-changa font-16 font-medium">
                         Mapa do Site
-                        <span class="d-block bg-yellow mt-1" style="height:3px; width:40px;"></span>
+                        <span class="d-block bg-accent-color mt-1" style="height:3px; width:40px;"></span>
                     </div>
 
                     <div class="row">
@@ -558,7 +559,7 @@
 
                         <div class="col-6">
                             <ul class="list-unstyled">
-                                <li><a href="{{ request()->routeIs('index') ? '#depoiment' : route('index') . '#depoiment' }}" class="text-color-footer font-changa font-16 font-regular text-decoration-none d-block mb-2">Depoimentos</a></li>
+                                <li><a href="{{ request()->routeIs('index') ? '#benefit' : route('index') . '#benefit' }}" class="text-color-footer font-changa font-16 font-regular text-decoration-none d-block mb-2">Benefícios</a></li>
                                 <li><a href="{{ request()->routeIs('index') ? '#faq' : route('index') . '#faq' }}" class="text-color-footer font-changa font-16 font-regular text-decoration-none d-block mb-2">FAQ</a></li>
                                 <li><a href="{{route('index')}}#contato" class="text-color-footer font-changa font-16 font-regular text-decoration-none d-block mb-2">Contato</a></li>
                             </ul>
@@ -624,13 +625,13 @@
                         <p id="footer-text" class="mb-0 text-color-footer"></p>
                     </div>
 
-                    <div class="col-12 col-lg-3 text-center small text-color-footer">
+                    <div class="col-12 col-lg-3 text-center small text-color-footer mt-0">
                         @if ($tenantTheme->privacy_policy <> null)                            
-                            <a href="#" class="text-color-footer text-decoration-none" data-bs-toggle="modal" data-bs-target="#privacyModal">Política de Privacidade</a>
+                            <a href="javascript:void(0)" class="text-color-footer text-decoration-none" data-bs-toggle="modal" data-bs-target="#privacyModal">Política de Privacidade</a>
                             <span class="mx-1">|</span>
                         @endif
                         @if ($tenantTheme->terms_of_use <> null)                            
-                            <a href="#" class="text-color-footer text-decoration-none" data-bs-toggle="modal" data-bs-target="#termsModal">Termos de Uso</a>
+                            <a href="javascript:void(0)" class="text-color-footer text-decoration-none" data-bs-toggle="modal" data-bs-target="#termsModal">Termos de Uso</a>
                         @endif
                     </div>
 
@@ -708,6 +709,8 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js" defer></script>
 
+     <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{-- Scripts do projeto --}}
     <script src="{{ asset('build/client/bootstrap/js/bootstrap.bundle.js') }}" defer></script>
     <script src="{{ asset('build/client/lgpd/script.js') }}" defer></script>
@@ -723,6 +726,8 @@
                 offset: 40
             });
         });
+
     </script>
+
 </body>
 </html>

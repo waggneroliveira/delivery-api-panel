@@ -34,7 +34,7 @@
 
                                             <div class="hero-actions d-flex mt-5" data-aos="fade-up" data-aos-delay="400">
                                                 @if ($slide->link <> null)                                    
-                                                    <a href="{{$slide->link}}" target="_blank" rel="noopener noreferrer" class="btn-one rounded-pill col-auto py-1 py-lg-2 px-3 px-lg-5 btn-hero font-changa bg-button-one color-button-one font-15 font-medium text-decoration-none hover-zoom">
+                                                    <a href="{{$slide->link}}" target="_blank" rel="noopener noreferrer" class="btn-one rounded-pill col-auto py-1 py-lg-2 px-3 px-lg-5 btn-hero font-changa bg-button-one color-button-one font-15 font-semibold text-decoration-none hover-zoom">
                                                         {{$slide->btn_title}}
                                                         <svg class="ms-2" width="9" height="13" viewBox="0 0 9 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M1.78794 12.474L8.02494 6.237L1.78794 -1.90735e-06L0.02079 1.76715L4.46985 6.237L0 10.7068L1.78794 12.474Z" fill="var(--color-button-one)"/>
@@ -84,14 +84,14 @@
 
     @if (isset($sections['service']) && $sections <> null || $services->count()) 
         <section id="services" class="services-section py-5 position-relative">
-            <img src="{{asset('build/client/images/themes/provedor/provedor-left-tp-02.png')}}" alt="Firula Left" class="position-absolute start-0 top-0" loading="lazy">
-            <img src="{{asset('build/client/images/themes/provedor/provedor-right-tp-02.png')}}" alt="Firula Right" class="position-absolute end-0 top-0" loading="lazy">
+            <img src="{{asset('build/client/images/themes/provedor/provedor-left-tp-02.png')}}" alt="Firula Left" class="z-index-0 position-absolute start-0 top-0" loading="lazy">
+            <img src="{{asset('build/client/images/themes/provedor/provedor-right-tp-02.png')}}" alt="Firula Right" class="z-index-0 position-absolute end-0 top-0" loading="lazy">
             
-            <div class="container-fluid px-3 px-lg-4">
+            <div class="container-fluid px-3 px-lg-4 z-index-1 position-relative">
                 @if (isset($sections['service']) && $sections <> null) 
                     <!-- Cabeçalho -->
                     <div class="row justify-content-center text-center mb-4">
-                        <div class="col-lg-8">
+                        <div class="col-12 col-lg-8 text-start text-lg-center">
                             <span class="services-badge border rounded-pill text-secondary font-15 font-semibold py-2 px-3">
                                 <svg class="me-1" width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3 5.78362C4.65685 5.78362 6 4.48891 6 2.89181C6 1.29471 4.65685 0 3 0C1.34315 0 0 1.29471 0 2.89181C0 4.48891 1.34315 5.78362 3 5.78362Z" fill="var(--accent-color)"/>
@@ -99,9 +99,8 @@
 
                                 {{ $sections['service']->tag }}
                             </span>
-                            <h2 class="services-title font-38 font-bold mt-3">{{ $sections['service']->title }}</h2>
-                            <h3 class="services-subtitle font-38 font-bold accent-color">{{ $sections['service']->subtitle }}</h3>
-                            <p class="font-15 font-regular text-secondary">{{ $sections['service']->description }}</p>
+                            <h2 class="services-title font-38 font-bold mt-3 mb-2 col-12 col-lg-10 m-auto text-start text-lg-center">{{ $sections['service']->title }} <span class="services-subtitle font-38 font-bold accent-color">{{ $sections['service']->subtitle }}</span></h2>
+                            <p class="font-15 font-regular text-secondary text-start text-lg-center">{{ $sections['service']->description }}</p>
                         </div>
                     </div>
                 @endif
@@ -146,14 +145,14 @@
             $hasTopics = $topics->count() > 0;
         @endphp
 
-        <section id="topic" class="topics py-5 bg-primary-color">
+        <section id="benefit" class="topics py-5 bg-primary-color">
             <div class="container">
                 <div class="row justify-content-center align-items-center">
 
                     {{-- Conteúdo da esquerda --}}
                     @if ($hasPilar)
                         <div class="content-left {{ $hasTopics ? 'col-12 col-lg-6' : 'col-12' }}">
-                            <h3 class="about-title font-changa font-40 font-bold text-white mb-3">
+                            <h3 class="about-title font-changa text-center text-lg-start font-40 font-bold text-white mb-3">
                                 {{ $sections['pilar']->title }}
                             </h3>
 
@@ -186,7 +185,7 @@
 
                     {{-- Conteúdo da direita --}}
                     @if ($hasTopics)
-                        <div class="content-right {{ $hasPilar ? 'col-12 col-lg-6' : 'col-12' }}">
+                        <div class="content-right mt-4 mt-lg-0 {{ $hasPilar ? 'col-12 col-lg-6' : 'col-12' }}">
                             <div class="row g-2 justify-content-start">
 
                                 @foreach ($topics as $topic)
@@ -226,17 +225,17 @@
     @if (isset($statute))
         <section class="step-to-step">
             <div class="container py-5">
-                <div class="row">
-                    <div class="left-content col-12 col-lg-5 z-3 d-flex flex-column align-items-center justify-content-center py-5">
+                <div class="row flex-column-reverse flex-lg-row">
+                    <div class="left-content col-12 col-lg-5 z-3 d-flex flex-column align-items-center justify-content-center py-3 py-lg-5">
                         @if (isset($statute) && $statute->path_file <> null)                    
                             <div class="image about-image position-relative">
                                 <div class="spa d-none d-lg-block"></div>
-                                <img src="{{asset('storage/' . $statute->path_file)}}" alt="Passo a passo" class="w-100 step-image img-contain rounded-4">
+                                <img src="{{asset('storage/' . $statute->path_file)}}" alt="Passo a passo" class="w-100 step-image img-contain rounded-2">
                             </div>
                         @endif
                     </div>
                     @if (isset($statute) && $statute->title || isset($statute) && $statute->subtitle || isset($statute) && $statute->description || isset($statute) && $statute->btn_number)
-                        <div class="right-content col-11 m-auto col-lg-7 py-5 px-2 px-md-3 px-lg-4">
+                        <div class="right-content col-11 m-auto col-lg-7 py-2 py-lg-5 px-2 px-md-3 px-lg-4">
                             <span class="services-badge border rounded-pill text-secondary font-15 font-semibold py-2 px-3">
                                 <svg class="me-1" width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3 5.78362C4.65685 5.78362 6 4.48891 6 2.89181C6 1.29471 4.65685 0 3 0C1.34315 0 0 1.29471 0 2.89181C0 4.48891 1.34315 5.78362 3 5.78362Z" fill="var(--accent-color)"/>
@@ -292,12 +291,12 @@
                 <path d="M14.75 8.46143H8.75V14.245H14.75V8.46143Z" fill="#84CC16"/>
                 </svg>
                 @foreach($abouts as $about)                    
-                    <div class="row align-items-center justify-content-center py-4">
+                    <div class="row col-11 col-lg-12 m-auto align-items-center justify-content-center py-4">
 
                         @if (isset($about->path_image) && $about->path_image <> null)                    
                             <!-- IMAGEM (fora do container) -->
                             <div class="col-12 col-lg-5 p-0 about-image" data-aos="fade-left" data-aos-delay="100">
-                                <div class="rounded-4 overflow-hidden img-contain m-auto">
+                                <div class="rounded-2 overflow-hidden img-contain m-auto">
                                     <img
                                     src="{{asset('storage/'.$about->path_image)}}"
                                     alt="{{$about->title}}"
@@ -310,7 +309,7 @@
 
                         <!-- TEXTO (dentro do container) -->
                         <div class="col-12 col-lg-7 mt-4 mt-lg-0 z-3 p-0" data-aos="fade-right" data-aos-delay="100">
-                            <div class="col-11 col-lg-11 position-relative">
+                            <div class="col-12 col-lg-11 position-relative">
                                 <h3 class="about-title font-changa font-38 font-bold mt-2 mt-lg-3 mb-3 text-white text-start">
                                     {{$about->title}}
                                 </h3>
@@ -410,578 +409,137 @@
             </div>
         </section>
     @endif
-
     
-    @if (isset($contact) && $contact <> null)
-        <section class="contact-section bg-light" data-aos="fade" data-aos-delay="100">
-            <!-- Título -->
-            <div class="container text-center py-3">
-                <span class="rounded-2 px-4 m-auto m-lg-0 py-2 text-dark text-center font-changa font-16 font-bold badge bg-white shadow-sm">
-                    Contato
-                </span>
+    <section id="contato" class="contact mb-0 mt-4">
+        <div class="container py-5">
+            <div class="row">
+                @if (isset($contact))
+                    <!-- Infos -->
+                    <div class="col-12 col-lg-5">
+                        <span class="services-badge border rounded-pill text-secondary font-15 font-semibold py-2 px-3">
+                            <svg class="me-1" width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 5.78362C4.65685 5.78362 6 4.48891 6 2.89181C6 1.29471 4.65685 0 3 0C1.34315 0 0 1.29471 0 2.89181C0 4.48891 1.34315 5.78362 3 5.78362Z" fill="var(--accent-color)"></path>
+                            </svg>
 
-                <h2 class="font-changa font-40 font-bold my-3 text-black text-center">
-                    {{$contact->name_section}} <span class="primary-color">{{$contact->text}}</span>
-                </h2>
-            </div>
-            <div id="contato"></div>
-            <!-- Informações de contato -->
-            <div class="container-fluid px-0">
-                <div class="bg-secondary-color border-bottom border-3 border-warning">
-                    <div class="container">
-                        <div class="row align-items-center justify-content-center">
+                            {{$contact->maps}}
+                        </span>
 
-                            <!-- Telefone -->
-                            @if ($contact->phone_one)                            
-                                <div class="col-md-4 py-3 px-4">
-                                    <div class="d-flex align-items-center justify-content-center gap-3">
-                                        <i class="bi bi-telephone fs-3 text-white"></i>
+                        @php
+                            $words = explode(' ', trim($contact->name_section));
+                            $lastWord = array_pop($words);
+                        @endphp
 
-                                        <span class="text-white fw-semibold small font-changa">
-                                            {{$contact->phone_one}}
-                                        </span>
+                        <h2 class="faq-title font-changa font-40 font-bold color-green mt-2 mb-3">
+                            {{ implode(' ', $words) }}
+                            <span style="color: var(--accent-color);">{{ $lastWord }}</span>
+                        </h2>
+
+                        <p class="faq-text color-grey font-changa font-16 font-regular text-center text-lg-start">
+                            {{$contact->text}}
+                        </p>
+        
+                        <ul class="list-unstyled">
+                            <li class="d-flex mb-3">
+                                <div class="me-3 text-success fs-4">
+                                    <i class="bi bi-geo-alt-fill accent-color"></i>
+                                </div>
+                                <div>
+                                    <span class="color-green font-changa font-16 font-semibold">Endereço</span>
+                                    <p class="color-grey font-changa font-16 font-regular col-12 col-lg-10">
+                                        {{$contact->address_one}}
+                                    </p>
+                                </div>
+                            </li>
+        
+                            <li class="d-flex mb-3">
+                                <div class="me-3 text-success fs-4">
+                                    <i class="bi bi-telephone-fill accent-color"></i>
+                                </div>
+                                <div>
+                                    <span class="color-green font-changa font-16 font-semibold">Telefone</span>
+                                    <p class="color-grey font-changa font-16 font-regular">{{$contact->phone_one}}</p>
+                                </div>
+                            </li>
+        
+                            <li class="d-flex">
+                                <div class="me-3 text-success fs-4">
+                                    <i class="bi bi-envelope-fill accent-color"></i>
+                                </div>
+                                <div>
+                                    <span class="color-green font-changa font-16 font-semibold">E-mail</span>
+                                    <p class="color-grey font-changa font-16 font-regular">{{$contact->name_one}}</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                @endif
+                
+                <div class="col-lg-7">
+                    <!-- Formulário e Mapa -->
+                    <div class="row g-4 mt-4">
+                        <div class="col-12">
+                            <form id="contactForm">
+                                @csrf
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <input type="text" required id="nome" name="name" class="poppins-regular font-15 text-color form-control" placeholder="Nome Completo">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="email" required id="email" name="email" class="poppins-regular font-15 text-color form-control" placeholder="E-mail">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" required id="phone" name="phone" class="poppins-regular font-15 text-color form-control" placeholder="Whatsapp para contato">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <input type="text" required id="subject" name="subject" class="poppins-regular font-15 text-color form-control" placeholder="Assunto">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <textarea id="text" required name="text" class="form-control poppins-regular font-15 text-color" rows="4" placeholder="Digite aqui...."></textarea>
+                                    </div>
+                                    <div class="col-12 d-flex align-items-center flex-wrap">
+                                        <div class="form-check me-3">
+                                            <input
+                                                class="form-check-input"
+                                                required
+                                                id="term_privacy"
+                                                name="term_privacy"
+                                                type="checkbox"
+                                                value="1">
+
+                                            <label
+                                                class="form-check-label small poppins-regular font-14 text-color"
+                                                for="term_privacy">
+                                                Concordo com a política de privacidade e autorizo a comunicações por e-mail e WhatsApp.
+                                            </label>
+                                        </div>
+                                        <button type="submit" class="bt-hover border font-changa font-bold font-14 bg-button-one color-button-one rounded-pill ms-auto py-2 px-4 mt-4 hover-zoom">
+                                            Garanta sua consultoria agora
+                                            <svg class="ms-2"
+                                            width="31"
+                                            height="13"
+                                            viewBox="0 0 31 13"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+
+                                            <path d="M24.1708 12.4741L30.4078 6.23712L24.1708 0.000120163L22.4036 1.76727L26.8527 6.23712L22.3828 10.707L24.1708 12.4741Z"
+                                                fill="var(--color-button-one)"/>
+
+                                            <path d="M0 5H27V7.2H0V5Z"
+                                                fill="var(--color-button-one)"/>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
-                            @endif
-
-                            <!-- Endereço -->
-                            @if ($contact->address_one)                            
-                                <div class="col-md-4 py-3 px-4 border-start border-end border-light border-opacity-50">
-                                    <div class="d-flex align-items-center justify-content-center gap-3">
-                                        <i class="bi bi-geo-alt fs-3 text-white"></i>
-
-                                        <span class="text-white fw-semibold small font-changa">
-                                            {{$contact->address_one}}
-                                        </span>
-                                    </div>
-                                </div>
-                            @endif
-
-                            <!-- E-mail -->
-                            @if ($contact->name_one)                            
-                                <div class="col-md-4 py-3 px-4">
-                                    <div class="d-flex align-items-center justify-content-center gap-3">
-                                        <i class="bi bi-envelope fs-3 text-white"></i>
-
-                                        <span class="text-white fw-semibold small font-changa">
-                                            {{$contact->name_one}}
-                                        </span>
-                                    </div>
-                                </div>
-                            @endif
-
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    @endif
+        </div>
+    </section>    
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
-            /*
-            * ==========================================================
-            * CONFIGURAÇÃO GERAL
-            * ==========================================================
-            */
-
-            const hasSwiper = typeof Swiper !== 'undefined';
-            const hasBootstrap = typeof bootstrap !== 'undefined';
-
-
-            /*
-            * ==========================================================
-            * SWIPER - SERVIÇOS
-            * ==========================================================
-            */
-
-            const servicesSwiper = document.querySelector('.servicesSwiper');
-
-            if (hasSwiper && servicesSwiper) {
-
-                new Swiper(servicesSwiper, {
-                    slidesPerView: 1,
-                    spaceBetween: 12,
-
-                    navigation: {
-                        nextEl: '.swiper-button-next-custom',
-                        prevEl: '.swiper-button-prev-custom'
-                    },
-
-                    breakpoints: {
-                        576: {
-                            slidesPerView: 2,
-                            spaceBetween: 12
-                        },
-
-                        992: {
-                            slidesPerView: 4,
-                            spaceBetween: 12
-                        }
-                    }
-                });
-
-            }
-
-
-            /*
-            * ==========================================================
-            * SWIPER - BLOG
-            * ==========================================================
-            */
-
-            const blogSwiper = document.querySelector('.blog-swiper');
-
-            if (hasSwiper && blogSwiper) {
-
-                new Swiper(blogSwiper, {
-                    spaceBetween: 24,
-
-                    pagination: {
-                        el: '.swiper-pagination-blog',
-                        clickable: true
-                    },
-
-                    breakpoints: {
-                        0: {
-                            slidesPerView: 1.3
-                        },
-
-                        576: {
-                            slidesPerView: 2
-                        },
-
-                        992: {
-                            slidesPerView: 4,
-                            allowTouchMove: false
-                        }
-                    }
-                });
-
-            }
-
-
-            /*
-            * ==========================================================
-            * SWIPER - DEPOIMENTOS
-            * ==========================================================
-            */
-
-            const testimonialSwiper = document.querySelector('.testimonial-swiper');
-
-            if (hasSwiper && testimonialSwiper) {
-
-                new Swiper(testimonialSwiper, {
-                    loop: true,
-                    spaceBetween: 24,
-
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true
-                    },
-
-                    breakpoints: {
-                        0: {
-                            slidesPerView: 1
-                        },
-
-                        768: {
-                            slidesPerView: 1
-                        }
-                    }
-                });
-
-            }
-
-
-            /*
-            * ==========================================================
-            * MODAL DE SERVIÇOS - serviceModal
-            * ==========================================================
-            */
-
-            const serviceModal = document.getElementById('serviceModal');
-
-            if (serviceModal && hasBootstrap) {
-
-                serviceModal.addEventListener('show.bs.modal', function (event) {
-
-                    const button = event.relatedTarget;
-
-                    if (!button) {
-                        return;
-                    }
-
-                    const title =
-                        button.dataset.title || 'Serviço';
-
-                    const icon =
-                        button.dataset.icon || '';
-
-                    const description =
-                        button.dataset.description || '';
-
-                    const modalTitle =
-                        document.getElementById('serviceModalLabel');
-
-                    const modalDescription =
-                        document.getElementById('serviceModalDescription');
-
-                    const modalIcon =
-                        document.getElementById('serviceModalIcon');
-
-
-                    /*
-                    * TÍTULO
-                    */
-
-                    if (modalTitle) {
-                        modalTitle.textContent = title;
-                    }
-
-
-                    /*
-                    * DESCRIÇÃO
-                    */
-
-                    if (modalDescription) {
-                        modalDescription.textContent = description;
-                    }
-
-
-                    /*
-                    * ÍCONE
-                    */
-
-                    if (modalIcon) {
-
-                        /*
-                        * Remove classes de ícone anteriores
-                        */
-                        modalIcon.className = '';
-
-                        /*
-                        * Adiciona as classes padrão
-                        */
-                        modalIcon.classList.add('bi', 'fs-5');
-
-                        /*
-                        * Adiciona o ícone informado
-                        */
-                        if (icon) {
-                            modalIcon.classList.add(...icon.split(' '));
-                        }
-
-                    }
-
-                });
-
-            }
-
-
-            /*
-            * ==========================================================
-            * MODAL DE SERVIÇOS - modalServico
-            * ==========================================================
-            */
-
-            const modalServico = document.getElementById('modalServico');
-
-            if (modalServico && hasBootstrap) {
-
-                /*
-                * ------------------------------------------------------
-                * ABRIR MODAL
-                * ------------------------------------------------------
-                */
-
-                modalServico.addEventListener('show.bs.modal', function (event) {
-
-                    const serviceCard = event.relatedTarget;
-
-                    if (!serviceCard) {
-                        return;
-                    }
-
-
-                    /*
-                    * DADOS DO SERVIÇO
-                    */
-
-                    const titulo =
-                        serviceCard.dataset.servicoTitulo || 'Serviço';
-
-                    const descricao =
-                        serviceCard.dataset.servicoDesc || '';
-
-                    const link =
-                        serviceCard.dataset.servicoLink || '';
-
-                    const scroll =
-                        serviceCard.dataset.servicoScroll || '';
-
-                    const icon =
-                        serviceCard.dataset.servicoIcon || '';
-
-
-                    /*
-                    * ELEMENTOS DO MODAL
-                    */
-
-                    const modalTitulo =
-                        modalServico.querySelector('#modalTitulo');
-
-                    const modalDescricao =
-                        modalServico.querySelector('#modalDescricao');
-
-                    const modalSolicitar =
-                        modalServico.querySelector('#modalSolicitar');
-
-                    const modalIcon =
-                        modalServico.querySelector('#modalIcon');
-
-
-                    /*
-                    * --------------------------------------------------
-                    * TÍTULO
-                    * --------------------------------------------------
-                    */
-
-                    if (modalTitulo) {
-                        modalTitulo.textContent = titulo;
-                    }
-
-
-                    /*
-                    * --------------------------------------------------
-                    * DESCRIÇÃO
-                    * --------------------------------------------------
-                    */
-
-                    if (modalDescricao) {
-                        modalDescricao.innerHTML = descricao;
-                    }
-
-
-                    /*
-                    * --------------------------------------------------
-                    * ÍCONE / IMAGEM
-                    * --------------------------------------------------
-                    */
-
-                    if (modalIcon) {
-
-                        if (icon) {
-
-                            modalIcon.src = icon;
-                            modalIcon.alt = titulo;
-                            modalIcon.classList.remove('d-none');
-
-                        } else {
-
-                            modalIcon.removeAttribute('src');
-                            modalIcon.alt = '';
-                            modalIcon.classList.add('d-none');
-
-                        }
-
-                    }
-
-
-                    /*
-                    * --------------------------------------------------
-                    * BOTÃO
-                    * --------------------------------------------------
-                    */
-
-                    if (!modalSolicitar) {
-                        return;
-                    }
-
-
-                    /*
-                    * RESET DO BOTÃO
-                    */
-
-                    modalSolicitar.classList.add('d-none');
-                    modalSolicitar.href = '#';
-
-                    modalSolicitar.removeAttribute('target');
-                    modalSolicitar.removeAttribute('rel');
-
-                    modalSolicitar.onclick = null;
-
-
-                    /*
-                    * --------------------------------------------------
-                    * LINK EXTERNO
-                    * --------------------------------------------------
-                    */
-
-                    if (link) {
-
-                        modalSolicitar.href = link;
-                        modalSolicitar.target = '_blank';
-                        modalSolicitar.rel = 'noopener noreferrer';
-
-                        modalSolicitar.classList.remove('d-none');
-
-                        return;
-                    }
-
-
-                    /*
-                    * --------------------------------------------------
-                    * SCROLL PARA SEÇÃO
-                    * --------------------------------------------------
-                    */
-
-                    if (scroll) {
-
-                        modalSolicitar.href = '#' + scroll;
-                        modalSolicitar.classList.remove('d-none');
-
-
-                        modalSolicitar.onclick = function (event) {
-
-                            event.preventDefault();
-
-
-                            /*
-                            * Verifica se o Bootstrap possui
-                            * a instância atual do modal.
-                            */
-
-                            const modalInstance =
-                                bootstrap.Modal.getInstance(modalServico);
-
-
-                            /*
-                            * Função responsável pelo scroll
-                            */
-
-                            const scrollToTarget = function () {
-
-                                const target =
-                                    document.getElementById(scroll);
-
-                                if (!target) {
-                                    return;
-                                }
-
-                                target.scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'start'
-                                });
-
-                            };
-
-
-                            /*
-                            * Fecha o modal antes do scroll
-                            */
-
-                            if (modalInstance) {
-
-                                modalServico.addEventListener(
-                                    'hidden.bs.modal',
-                                    scrollToTarget,
-                                    { once: true }
-                                );
-
-                                modalInstance.hide();
-
-                            } else {
-
-                                setTimeout(scrollToTarget, 150);
-
-                            }
-
-                        };
-
-                        return;
-                    }
-
-
-                    /*
-                    * --------------------------------------------------
-                    * SEM AÇÃO
-                    * --------------------------------------------------
-                    */
-
-                    modalSolicitar.classList.add('d-none');
-                    modalSolicitar.href = '#';
-
-                });
-
-
-                /*
-                * ------------------------------------------------------
-                * MODAL FECHADO
-                * ------------------------------------------------------
-                */
-
-                modalServico.addEventListener('hidden.bs.modal', function () {
-
-                    /*
-                    * Remove o foco do elemento ativo
-                    */
-
-                    if (
-                        document.activeElement &&
-                        typeof document.activeElement.blur === 'function'
-                    ) {
-                        document.activeElement.blur();
-                    }
-
-
-                    /*
-                    * Elementos
-                    */
-
-                    const modalSolicitar =
-                        modalServico.querySelector('#modalSolicitar');
-
-                    const modalIcon =
-                        modalServico.querySelector('#modalIcon');
-
-
-                    /*
-                    * RESET DO BOTÃO
-                    */
-
-                    if (modalSolicitar) {
-
-                        modalSolicitar.href = '#';
-
-                        modalSolicitar.removeAttribute('target');
-                        modalSolicitar.removeAttribute('rel');
-
-                        modalSolicitar.classList.add('d-none');
-
-                        modalSolicitar.onclick = null;
-
-                    }
-
-
-                    /*
-                    * RESET DO ÍCONE
-                    */
-
-                    if (modalIcon) {
-
-                        modalIcon.removeAttribute('src');
-                        modalIcon.alt = '';
-
-                        modalIcon.classList.add('d-none');
-
-                    }
-
-                });
-
-            }
-
 
             /*
             * ==========================================================
@@ -989,88 +547,105 @@
             * ==========================================================
             */
 
-            const phoneInput =
-                document.querySelector('#phone');
+            const phoneInput = document.querySelector('#phone');
 
-
-            if (
-                phoneInput &&
-                !phoneInput.dataset.masked
-            ) {
+            if (phoneInput && !phoneInput.dataset.masked) {
 
                 phoneInput.addEventListener('input', function (event) {
 
-                    let value =
-                        event.target.value.replace(/\D/g, '');
+                    let value = event.target.value.replace(/\D/g, '');
 
-
-                    /*
-                    * Permite apagar o campo completamente
-                    */
-
+                    // Permite apagar completamente
                     if (!value) {
-
                         event.target.value = '';
-
                         return;
                     }
 
-
-                    /*
-                    * Força o DDD 71
-                    */
-
-                    if (!value.startsWith('71')) {
-                        value = '71' + value;
-                    }
-
-
-                    /*
-                    * Limita a 11 dígitos
-                    */
-
+                    // Limita a 11 dígitos
                     value = value.slice(0, 11);
 
+                    let formatted = '';
 
-                    /*
-                    * Monta a máscara
-                    *
-                    * (71) 9 9999-9999
-                    */
-
-                    let formatted =
-                        '(' + value.slice(0, 2) + ')';
-
-
-                    if (value.length > 2) {
-                        formatted += ' ' + value.slice(2, 3);
+                    if (value.length > 0) {
+                        formatted = '(' + value.slice(0, 2);
                     }
 
+                    if (value.length >= 3) {
+                        formatted += ') ' + value.slice(2, 3);
+                    }
 
-                    if (value.length > 3) {
+                    if (value.length >= 4) {
                         formatted += ' ' + value.slice(3, 7);
                     }
 
-
-                    if (value.length > 7) {
-                        formatted += '-' + value.slice(7);
+                    if (value.length >= 8) {
+                        formatted += '-' + value.slice(7, 11);
                     }
-
 
                     event.target.value = formatted;
 
                 });
 
-
-                /*
-                * Evita registrar o listener novamente
-                */
-
                 phoneInput.dataset.masked = 'true';
-
             }
 
         });
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#contactForm').on('submit', function(e) {
+                e.preventDefault();
 
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: '{{ route("send-contact") }}',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                heightAuto: false
+                            });
+                        }
+                        $('#contactForm')[0].reset();
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            let errorMessages = '';
+                            for (let field in errors) {
+                                errorMessages += errors[field][0] + '\n';
+                            }
+
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    title: 'Erro',
+                                    text: errorMessages,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK',
+                                    heightAuto: false
+                                });
+                            }
+                        } else {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    title: 'Erro',
+                                    text: 'Ocorreu um erro ao enviar a mensagem. Por favor, tente novamente.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
