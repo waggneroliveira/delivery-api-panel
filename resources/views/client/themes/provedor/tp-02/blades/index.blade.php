@@ -113,7 +113,7 @@
                             <div class="col px-2">
                                 <div class="service-card rounded-3">
                                     <div class="service-content align-items-start">
-                                        <h3 class="font-changa font-bold font-18 text-uppercase">{{$service->title}}</h3>
+                                        <div class="font-changa font-bold font-18 text-uppercase mb-3">{{$service->title}}</div>
 
                                         <div class="service-list">
                                             {!!$service->text!!}
@@ -152,9 +152,9 @@
                     {{-- Conteúdo da esquerda --}}
                     @if ($hasPilar)
                         <div class="content-left {{ $hasTopics ? 'col-12 col-lg-6' : 'col-12' }}">
-                            <h3 class="about-title font-changa text-center text-lg-start font-40 font-bold text-white mb-3">
+                            <h2 class="about-title font-changa text-center text-lg-start font-40 font-bold text-white mb-3">
                                 {{ $sections['pilar']->title }}
-                            </h3>
+                            </h2>
 
                             @if ($sections['pilar']->link != null)
                                 <div class="step-actions gap-3 d-flex mt-4 flex-wrap justify-content-center justify-content-lg-start">
@@ -244,9 +244,10 @@
                                 {{$statute->text_atend}}
                             </span>
                 
-                            <h3 class="about-title font-changa font-38 font-semibold primary-color my-3">
-                                {{$statute->title}} <br> <span class="accent-color">{{$statute->subtitle}}</span>
-                            </h3>
+                            <h2 class="about-title font-changa font-38 font-semibold primary-color mt-3 mb-0">
+                                {{$statute->title}}
+                            </h2>
+                            <h3 class="font-changa font-38 font-semibold primary-color accent-color">{{$statute->subtitle}}</h3>
 
                             <div class="list-unstyled list-step mt-5 position-relative">
                                 {!!$statute->description!!}
@@ -385,16 +386,16 @@
                                 <!-- ITEM ATIVO -->
                                 @foreach ($faqs as $faq)     
                                     <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed font-changa font-16 font-regular"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#faq-{{$faq->id}}">
-                                            {{$faq->question}}
-                                        </button>
-                                        </h2>
+                                        <div class="accordion-header">
+                                            <button class="accordion-button collapsed font-changa font-16 font-medium"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#faq-{{$faq->id}}">
+                                                {{$faq->question}}
+                                            </button>
+                                        </div>
                                         <div id="faq-{{$faq->id}}" class="accordion-collapse collapse"
                                         data-bs-parent="#faqAccordion">
-                                            <div class="accordion-body font-changa font-16 font-regular">
+                                            <div class="accordion-body font-changa font-15 font-regular">
                                                 {!! $faq->answer !!}
                                             </div>
                                         </div>
@@ -429,10 +430,13 @@
                             $lastWord = array_pop($words);
                         @endphp
 
-                        <h2 class="faq-title font-changa font-40 font-bold color-green mt-2 mb-3">
-                            {{ implode(' ', $words) }}
-                            <span style="color: var(--accent-color);">{{ $lastWord }}</span>
-                        </h2>
+                        <div class="d-flex gap-2 mt-2 mb-3">
+                            <h3 class="faq-title font-changa font-40 font-bold">
+                                {{ implode(' ', $words) }}                            
+                            </h3>
+
+                            <h4 class="font-changa font-40 font-bold" style="color: var(--accent-color);"> {{ $lastWord }}</h4>
+                        </div>
 
                         <p class="faq-text color-grey font-changa font-16 font-regular text-center text-lg-start">
                             {{$contact->text}}
