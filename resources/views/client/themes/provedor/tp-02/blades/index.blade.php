@@ -14,7 +14,7 @@
                                 <div class="hero-bg">
                                     <picture>
                                         <source srcset="{{ asset('storage/' . $slide->path_image_mobile) }}" media="(max-width: 530px)">
-                                        <img src="{{ asset('storage/' . $slide->path_image) }}" alt="Distribuição PET" title="Distribuição PET">
+                                        <img src="{{ asset('storage/' . $slide->path_image) }}" alt="{{$slide->title}}" title="{{$slide->title}}">
                                     </picture>
                                 </div>
 
@@ -34,10 +34,20 @@
 
                                             <div class="hero-actions d-flex mt-5" data-aos="fade-up" data-aos-delay="400">
                                                 @if ($slide->link <> null)                                    
-                                                    <a href="{{$slide->link}}" target="_blank" rel="noopener noreferrer" class="btn-one rounded-pill col-auto py-1 py-lg-2 px-3 px-lg-5 btn-hero font-changa bg-button-one color-button-one font-15 font-semibold text-decoration-none hover-zoom">
+                                                    <a href="{{$slide->link}}" target="_blank" rel="noopener noreferrer" class="btn-one rounded-pill col-auto py-1 py-lg-2 px-3 px-lg-4 btn-hero font-changa bg-button-one color-button-one font-15 font-semibold text-decoration-none hover-zoom">
                                                         {{$slide->btn_title}}
-                                                        <svg class="ms-2" width="9" height="13" viewBox="0 0 9 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M1.78794 12.474L8.02494 6.237L1.78794 -1.90735e-06L0.02079 1.76715L4.46985 6.237L0 10.7068L1.78794 12.474Z" fill="var(--color-button-one)"/>
+                                                        <svg class="ms-2"
+                                                        width="31"
+                                                        height="13"
+                                                        viewBox="0 0 31 13"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+
+                                                        <path d="M24.1708 12.4741L30.4078 6.23712L24.1708 0.000120163L22.4036 1.76727L26.8527 6.23712L22.3828 10.707L24.1708 12.4741Z"
+                                                            fill="var(--color-button-one)"/>
+
+                                                        <path d="M0 5H27V7.2H0V5Z"
+                                                            fill="var(--color-button-one)"/>
                                                         </svg>
                                                     </a>
                                                 @endif
@@ -152,14 +162,14 @@
                     {{-- Conteúdo da esquerda --}}
                     @if ($hasPilar)
                         <div class="content-left {{ $hasTopics ? 'col-12 col-lg-6' : 'col-12' }}">
-                            <h2 class="about-title font-changa text-center text-lg-start font-40 font-bold text-white mb-3">
+                            <h2 class="about-title font-changa text-start font-40 font-bold text-white mb-3">
                                 {{ $sections['pilar']->title }}
                             </h2>
 
                             @if ($sections['pilar']->link != null)
-                                <div class="step-actions gap-3 d-flex mt-4 flex-wrap justify-content-center justify-content-lg-start">
+                                <div class="step-actions gap-3 d-flex mt-4 flex-wrap justify-content-start">
                                     <a href="{{ $sections['pilar']->link }}"
-                                    class="rounded-pill py-2 px-4 hover-zoom btn-hero font-changa bg-button-one color-button-one font-15 font-bold text-decoration-none"
+                                    class="rounded-pill py-2 px-4 hover-zoom btn-hero font-changa bg-button-one color-button-one font-14 font-bold text-decoration-none"
                                     rel="noopener noreferrer">
 
                                         {{ $sections['pilar']->btn_title }}
@@ -189,7 +199,7 @@
                             <div class="row g-2 justify-content-start">
 
                                 @foreach ($topics as $topic)
-                                    <div class="{{ $hasPilar ? 'col-12 col-lg-4' : 'col-6 col-md-4 col-lg' }} mb-2">
+                                    <div class="{{ $hasPilar ? 'col-6 col-lg-4' : 'col-6 col-md-4 col-lg' }} mb-2">
 
                                         @if ($topic->link != null)
                                             <a href="{{ $topic->link }}"
@@ -235,7 +245,7 @@
                         @endif
                     </div>
                     @if (isset($statute) && $statute->title || isset($statute) && $statute->subtitle || isset($statute) && $statute->description || isset($statute) && $statute->btn_number)
-                        <div class="right-content col-11 m-auto col-lg-7 py-2 py-lg-5 px-2 px-md-3 px-lg-4">
+                        <div class="right-content col-12 m-auto col-lg-7 py-2 py-lg-5 px-2 px-md-3 px-lg-4">
                             <span class="services-badge border rounded-pill text-secondary font-15 font-semibold py-2 px-3">
                                 <svg class="me-1" width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3 5.78362C4.65685 5.78362 6 4.48891 6 2.89181C6 1.29471 4.65685 0 3 0C1.34315 0 0 1.29471 0 2.89181C0 4.48891 1.34315 5.78362 3 5.78362Z" fill="var(--accent-color)"/>
@@ -363,7 +373,7 @@
 
                             @if ($sessaoFaq->btn_title <> null && $sessaoFaq->btn_number <> null)                
                                 <div class="d-flex justify-content-lg-start align-items-center">
-                                    <a href="{{$sessaoFaq->btn_number}}" class="bg-button-one color-button-one rounded-pill btn-product py-1 py-lg-2 px-4 font-15 hover-zoom">
+                                    <a href="{{$sessaoFaq->btn_number}}" class="bg-button-one color-button-one rounded-pill btn-product py-1 py-lg-2 px-4 font-14 font-bold hover-zoom">
                                         {{$sessaoFaq->btn_title}}
                                         <svg class="ms-2" width="9" height="13" viewBox="0 0 9 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M1.78794 12.474L8.02494 6.237L1.78794 -1.90735e-06L0.02079 1.76715L4.46985 6.237L0 10.7068L1.78794 12.474Z" fill="var(--color-button-one)"/>
