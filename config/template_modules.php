@@ -368,6 +368,7 @@ return [
                     'benefits',//parametro
                     'faq_session',
                     'faq',
+                    'statute',
                 ],
             ],
 

@@ -81,6 +81,7 @@
             </div>
         </section>
     @endif
+
     @if (isset($sections['service']) && $sections <> null || $services->count()) 
         <section id="services" class="services-section py-5 position-relative">
             <img src="{{asset('build/client/images/themes/provedor/provedor-left-tp-02.png')}}" alt="Firula Left" class="position-absolute start-0 top-0" loading="lazy">
@@ -159,7 +160,7 @@
                             @if ($sections['pilar']->link != null)
                                 <div class="step-actions gap-3 d-flex mt-4 flex-wrap justify-content-center justify-content-lg-start">
                                     <a href="{{ $sections['pilar']->link }}"
-                                    class="rounded-pill py-2 px-4 hover-zoom btn-hero font-changa bg-button-one color-button-one font-15 font-medium text-decoration-none"
+                                    class="rounded-pill py-2 px-4 hover-zoom btn-hero font-changa bg-button-one color-button-one font-15 font-bold text-decoration-none"
                                     rel="noopener noreferrer">
 
                                         {{ $sections['pilar']->btn_title }}
@@ -217,6 +218,66 @@
                         </div>
                     @endif
 
+                </div>
+            </div>
+        </section>
+    @endif
+
+    @if (isset($statute))
+        <section class="step-to-step">
+            <div class="container py-5">
+                <div class="row">
+                    <div class="left-content col-12 col-lg-5 z-3 d-flex flex-column align-items-center justify-content-center py-5">
+                        @if (isset($statute) && $statute->path_file <> null)                    
+                            <div class="image about-image position-relative">
+                                <div class="spa d-none d-lg-block"></div>
+                                <img src="{{asset('storage/' . $statute->path_file)}}" alt="Passo a passo" class="w-100 step-image img-contain rounded-4">
+                            </div>
+                        @endif
+                    </div>
+                    @if (isset($statute) && $statute->title || isset($statute) && $statute->subtitle || isset($statute) && $statute->description || isset($statute) && $statute->btn_number)
+                        <div class="right-content col-11 m-auto col-lg-7 py-5 px-2 px-md-3 px-lg-4">
+                            <span class="services-badge border rounded-pill text-secondary font-15 font-semibold py-2 px-3">
+                                <svg class="me-1" width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 5.78362C4.65685 5.78362 6 4.48891 6 2.89181C6 1.29471 4.65685 0 3 0C1.34315 0 0 1.29471 0 2.89181C0 4.48891 1.34315 5.78362 3 5.78362Z" fill="var(--accent-color)"/>
+                                </svg>
+
+                                {{$statute->text_atend}}
+                            </span>
+                
+                            <h3 class="about-title font-changa font-38 font-semibold primary-color my-3">
+                                {{$statute->title}} <br> <span class="accent-color">{{$statute->subtitle}}</span>
+                            </h3>
+
+                            <div class="list-unstyled list-step mt-5 position-relative">
+                                {!!$statute->description!!}
+                            </div>
+                            @if ($statute->btn_number <> null)                    
+                                <div class="step-actions mt-5 d-flex justify-content-center justify-content-lg-start">
+                                    <a href="{{$statute->btn_number}}"
+                                    class="rounded-pill py-2 px-4 hover-zoom btn-hero font-changa bg-button-one color-button-one font-15 font-bold text-decoration-none"
+                                    rel="noopener noreferrer">
+
+                                        {{$statute->btn_title}}
+
+                                        <svg class="ms-2"
+                                            width="31"
+                                            height="13"
+                                            viewBox="0 0 31 13"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+
+                                            <path d="M24.1708 12.4741L30.4078 6.23712L24.1708 0.000120163L22.4036 1.76727L26.8527 6.23712L22.3828 10.707L24.1708 12.4741Z"
+                                                fill="var(--color-button-one)"/>
+
+                                            <path d="M0 5H27V7.2H0V5Z"
+                                                fill="var(--color-button-one)"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
         </section>
@@ -350,101 +411,6 @@
         </section>
     @endif
 
-    @if (isset($depoiments) && $depoiments->count())
-        <section id="depoiment" class="depoiment py-5 position-relative bg-secondary-color" data-aos="fade-up" data-aos-delay="100">
-            <div class="container">
-                <div class="row justify-content-center justify-content-lg-between align-items-start">
-                    @if (isset($sections['testimonial']) && $sections <> null)    
-                        <div class="col-lg-5 d-table text-start">
-                            <span class="rounded-2 col-5 col-lg-4 px-3 py-1 bg-white text-dark text-center font-changa font-16 font-bold d-block mb-2">
-                                {{$sections['testimonial']->tag}}
-                            </span>
-        
-                            <h2 class="font-changa font-40 title font-bold text-white text-start mb-3">
-                                {{$sections['testimonial']->title}}
-                            </h2>
-                            <p class="font-regular text-white mb-0 font-changa font-18">{{$sections['testimonial']->description}}</p>
-                        </div>
-                    @endif
-                    <div class="col-lg-6 mt-lg-0 mt-5">
-                        <div class="swiper testimonial-swiper">
-                            <div class="swiper-wrapper">
-        
-                                <!-- Slide -->
-                                @foreach ($depoiments as $depoiment)                    
-                                    <div class="swiper-slide">
-                                        <div class="testimonial-card position-relative">
-                                            <svg width="127" height="21" viewBox="0 0 127 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M10.7957 15.7848L4.08407 20.6321L6.72967 12.7486L0.000266403 7.88357H8.2389L10.7957 4.30346e-05L13.3525 7.88357H21.5912L14.8618 12.7486L17.5074 20.6321L10.7957 15.7848ZM36.9432 15.7848L30.2315 20.6321L32.8771 12.7486L26.1477 7.88357H34.3864L36.9432 4.30346e-05L39.5 7.88357H47.7386L41.0092 12.7486L43.6548 20.6321L36.9432 15.7848ZM63.0906 15.7848L56.379 20.6321L59.0246 12.7486L52.2952 7.88357H60.5338L63.0906 4.30346e-05L65.6475 7.88357H73.8861L67.1567 12.7486L69.8023 20.6321L63.0906 15.7848ZM89.2381 15.7848L82.5265 20.6321L85.1721 12.7486L78.4426 7.88357H86.6813L89.2381 4.30346e-05L91.7949 7.88357H100.034L93.3042 12.7486L95.9498 20.6321L89.2381 15.7848ZM115.386 15.7848L108.674 20.6321L111.32 12.7486L104.59 7.88357H112.829L115.386 4.30346e-05L117.942 7.88357H126.181L119.452 12.7486L122.097 20.6321L115.386 15.7848Z" fill="var(--primary-color)"/>
-                                            </svg>
-
-                                            <div class="text color-grey font-changa font-16 font-regular text-start mt-4">
-                                                {!!$depoiment->text!!}
-                                            </div>
-        
-                                            <div class="author">
-                                                <div class="text-dark font-changa font-24 title font-medium mb-0 mt-3">{{$depoiment->name}}</div>
-                                                <span class="text-dark font-changa font-16 font-regular">{{$depoiment->function}}</span>
-                                            </div>
-
-                                            <div class="position-absolute firula-testimonial">
-                                                <svg width="102" height="102" viewBox="0 0 102 102" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M51 102C79.1665 102 102 79.1665 102 51C102 22.8335 79.1665 0 51 0C22.8335 0 0 22.8335 0 51C0 79.1665 22.8335 102 51 102Z" fill="white"/>
-                                                <path d="M51 94C74.7482 94 94 74.7482 94 51C94 27.2518 74.7482 8 51 8C27.2518 8 8 27.2518 8 51C8 74.7482 27.2518 94 51 94Z" fill="var(--primary-color"/>
-                                                <path d="M33.5778 38.5V33.5142C33.5778 32.0985 33.8548 30.652 34.4087 29.1747C34.9627 27.6974 35.6937 26.3048 36.6016 24.9968C37.5095 23.6888 38.4943 22.5962 39.5561 21.7191L43.8956 24.2812C43.0339 25.6354 42.326 27.0511 41.772 28.5284C41.2334 30.0057 40.9641 31.6522 40.9641 33.468V38.5H33.5778ZM45.2344 38.5V33.5142C45.2344 32.0985 45.5114 30.652 46.0653 29.1747C46.6193 27.6974 47.3503 26.3048 48.2582 24.9968C49.1661 23.6888 50.1509 22.5962 51.2127 21.7191L55.5522 24.2812C54.6905 25.6354 53.9826 27.0511 53.4286 28.5284C52.89 30.0057 52.6207 31.6522 52.6207 33.468V38.5H45.2344Z" fill="black"/>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-        
-                            </div>
-        
-                            <!-- Dots -->
-                            <div class="swiper-pagination mt-4 position-relative d-flex justify-content-center align-items-center"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    @endif
-
-    @if (isset($serviceLocation))
-        <section id="coverage-section" class="coverage-section py-5 position-relative bg-light" data-aos="fade-down" data-aos-delay="100">
-            <div class="container">
-                <div class="row align-items-start gy-4">
-                    <!-- MAPA -->
-                    <div class="col-12 col-lg-6">
-                        <div class="mb-4 col-12 col-lg-11">
-                            <span class="rounded-2 col-5 col-lg-4 px-3 m-lg-0 py-2 bg-primary-color text-dark text-center font-changa font-16 font-bold d-block">
-                                Cobertura
-                            </span>
-
-                            <h3 class="about-title text-start font-changa font-40 font-bold text-dark my-3 position-relative">                            
-                                {{$serviceLocation->title}}
-                            </h3>
-                        </div>
-                        
-                        <!-- BAHIA -->
-                        <div class="state-block mb-4">
-                            <div class="row list-service col-12 m-auto">
-                                {!! $serviceLocation->description !!}
-                            </div>
-                        </div>
-                    </div>
-                    <!-- LISTAS -->
-                    <div class="col-12 col-lg-6 mt-0 text-center">
-                        <!-- BAHIA -->
-                        <img loading="lazy"  
-                            src="{{asset('storage/' .$serviceLocation->path_image)}}" 
-                            alt="Mapa de cobertura"
-                            class="img-fluid coverage-map"
-                            >
-                    </div>
-                </div>
-            </div>
-        </section>
-    @endif
     
     @if (isset($contact) && $contact <> null)
         <section class="contact-section bg-light" data-aos="fade" data-aos-delay="100">

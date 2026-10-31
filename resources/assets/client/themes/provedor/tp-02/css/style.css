@@ -171,12 +171,55 @@
     height: 100%;
 }
 .list-step p, .list-step li{
-    font-size: 1rem;
+    font-size: 0.983rem;
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
     font-weight: 400;
     color: #565656;
+}
+.list-step ol {
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    gap: 20px;
+}
+.image .spa{
+    position: absolute;
+    left: -69px;
+    top: -75px;
+    background: #1E1E1E;
+    height: 470px;
+    width: 270px;
+    z-index: -1;
+}
+.list-step li {
+    list-style: none;
+    counter-increment: step;
+    position: relative;
+    padding-left: 40px;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.list-step li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    font-size: 14px;
 }
 .navigation-swiper{
     position: absolute;
