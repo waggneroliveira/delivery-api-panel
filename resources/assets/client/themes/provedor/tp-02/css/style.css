@@ -202,6 +202,12 @@
     padding-left: 40px;
     font-weight: 600;
     margin-bottom: 0;
+    transition: all 0.3s ease;
+}
+.list-step li:hover::before{
+    background: var(--accent-color);
+    color: #FFF;
+    transition: all 0.3s ease;
 }
 
 .list-step li::before {
@@ -217,7 +223,7 @@
     align-items: center;
     justify-content: center;
 
-    border: 1px solid #ccc;
+    border: 2px solid #565656;
     border-radius: 50%;
     font-size: 14px;
 }

@@ -3,7 +3,6 @@
 @endphp
 <div class="row">
     <div class="col-12 col-lg-6">
-        <h5 class="modal-title mb-3">Conteúdo esquerdo</h5>
         <div class="mb-3 col-12">
             <label for="text_atend" class="form-label">Tag</label>
             <input 
@@ -16,25 +15,7 @@
             >
         </div>
 
-        <div class="mb-3 col-12">
-            <label for="path_file" class="form-label">Imagem</label>
-            <input 
-                type="file" 
-                name="path_file" 
-                {{-- accept="application/pdf" --}}
-                data-plugins="dropify" 
-                data-default-file="{{ isset($statute) && $statute->path_file != '' ? url('storage/'.$statute->path_file) : '' }}" 
-                class="form-control"
-            />
-            <p class="text-muted text-center mt-2 mb-0">
-                {{ __('dashboard.text_img_size') }} <b class="text-danger">3 MB</b>.
-            </p>
-        </div>
-    </div>
-
-    <div class="col-12 col-lg-6">
-        <h5 class="modal-title mb-3">Conteúdo direito</h5>
-        <div class="row">
+                <div class="row">
             <div class="mb-3 col-12">
                 <label for="title" class="form-label">Título</label>
                 <input 
@@ -88,6 +69,24 @@
                 </textarea>
             </div>
         </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+                <div class="mb-3 col-12">
+            <label for="path_file" class="form-label">Imagem</label>
+            <input 
+                type="file" 
+                name="path_file" 
+                {{-- accept="application/pdf" --}}
+                data-plugins="dropify" 
+                data-default-file="{{ isset($statute) && $statute->path_file != '' ? url('storage/'.$statute->path_file) : '' }}" 
+                class="form-control"
+            />
+            <p class="text-muted text-center mt-2 mb-0">
+                {{ __('dashboard.text_img_size') }} <b class="text-danger">3 MB</b>.
+            </p>
+        </div>
+
         <div class="mb-3 col-12">
             <div class="form-check">
                 <input 
