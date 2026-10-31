@@ -40,7 +40,8 @@ class BenefitTopicController extends Controller
         $benefitTopics = BenefitTopic::get();
         $theme = $themeManager;
         $themeData = $themeManager->theme();
-        return view('admin.blades.benefitTopic.index', compact('benefitTopics', 'theme', 'themeData'));
+        $benefitTopicsLimit = $themeManager->getLimit('benefits', 0);
+        return view('admin.blades.benefitTopic.index', compact('benefitTopicsLimit', 'benefitTopics', 'theme', 'themeData'));
     }
 
     public function store(Request $request)

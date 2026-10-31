@@ -39,7 +39,7 @@
                                             Auth::user()->can('parametro.criar') ||
                                             Auth::user()->can('usuario.tornar usuario master') || 
                                             Auth::user()->hasRole('Super'))
-                                                @if (isset($benefitTopics) && $benefitTopics->count() < 4)                                                
+                                                @if (isset($benefitTopics) && $benefitTopics->count() < $benefitTopicsLimit)                                                
                                                     <button type="button" class="btn btn-primary text-black waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#benefitTopic-create"><i class="mdi mdi-plus-circle me-1"></i> {{__('dashboard.btn_create')}}</button>
                                                 @endif
                                                 <!-- Modal -->

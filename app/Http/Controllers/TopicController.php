@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ServiceSection;
 use App\Models\Topic;
 use App\Repositories\SettingThemeRepository;
 use App\Services\ThemeManager;
@@ -50,10 +51,14 @@ class TopicController extends Controller
             'path_image',
         )->sorting()->get();
         
+        $serviceSection = ServiceSection::whereIn('section', ['pilar'])
+        ->get()
+        ->keyBy('section');
+
         $theme = $themeManager;
         $themeData = $themeManager->theme();
         
-        return view('admin.blades.topic.index', compact('topics', 'theme', 'themeData'));
+        return view('admin.blades.topic.index', compact('topics', 'theme', 'themeData', 'serviceSection'));
     }
 
     public function store(Request $request, ThemeManager $themeManager)

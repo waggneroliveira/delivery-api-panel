@@ -109,7 +109,7 @@
                                                                 <div class="modal-dialog modal-dialog-centered" style="max-width: 1320px;">
                                                                     <div class="modal-content">
                                                                         <div class="modal-header bg-light">
-                                                                            <h4 class="modal-title" id="myCenterModalLabel">passo a passo</h4>
+                                                                            <h4 class="modal-title" id="myCenterModalLabel">Editar</h4>
                                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
                                                                         </div>
                                                                         <div class="modal-body  p-2 px-3 px-md-4">

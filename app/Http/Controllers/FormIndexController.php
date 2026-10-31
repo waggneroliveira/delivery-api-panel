@@ -8,6 +8,7 @@ use App\Services\ThemeManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class FormIndexController extends Controller
@@ -70,6 +71,8 @@ class FormIndexController extends Controller
 
     public function destroy(FormIndex $formIndex)
     {
-        //
+        $formIndex->delete();
+        Session::flash('success',__('dashboard.response_item_delete'));
+        return redirect()->back();
     }
 }
