@@ -33,7 +33,7 @@ class User extends Authenticatable implements CanResetPassword
         'remember_token',
     ];
 
-    protected static $recordEvents = ['created', 'deleted']; //OBS: Com isso eu evito que, ao deslogar, o activity log registre o evento de update quando eu deslogar
+    protected static $recordEvents = ['created', 'updated', 'deleted'];
     protected function casts(): array
     {
         return [
