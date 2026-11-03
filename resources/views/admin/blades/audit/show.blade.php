@@ -151,12 +151,14 @@
                             $properties = $activitie->properties instanceof \Illuminate\Support\Collection
                                 ? $activitie->properties->all()
                                 : (array) ($activitie->properties ?? []);
-                            $oldValues = $properties['old'] instanceof \Illuminate\Support\Collection
-                                ? $properties['old']->all()
-                                : (array) ($properties['old'] ?? []);
-                            $newValues = $properties['attributes'] instanceof \Illuminate\Support\Collection
-                                ? $properties['attributes']->all()
-                                : (array) ($properties['attributes'] ?? []);
+                            $oldValue = \Illuminate\Support\Arr::get($properties, 'old', []);
+                            $newValue = \Illuminate\Support\Arr::get($properties, 'attributes', []);
+                            $oldValues = $oldValue instanceof \Illuminate\Support\Collection
+                                ? $oldValue->all()
+                                : (array) $oldValue;
+                            $newValues = $newValue instanceof \Illuminate\Support\Collection
+                                ? $newValue->all()
+                                : (array) $newValue;
                             $changedAttributes = array_values(array_unique(array_merge(array_keys($oldValues), array_keys($newValues))));
                             $formatAuditValue = function ($value) {
                                 if (is_array($value) || is_object($value)) {
