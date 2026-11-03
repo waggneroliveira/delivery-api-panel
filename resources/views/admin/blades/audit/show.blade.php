@@ -148,12 +148,15 @@
                             <h5>{{__('blades/audit.old_value')}}</h5>
                         </div>
                         @php
-                            $oldValues = $activitie->properties['old'] instanceof \Illuminate\Support\Collection
-                                ? $activitie->properties['old']->all()
-                                : ($activitie->properties['old'] ?? []);
-                            $newValues = $activitie->properties['attributes'] instanceof \Illuminate\Support\Collection
-                                ? $activitie->properties['attributes']->all()
-                                : ($activitie->properties['attributes'] ?? []);
+                            $properties = $activitie->properties instanceof \Illuminate\Support\Collection
+                                ? $activitie->properties->all()
+                                : (array) ($activitie->properties ?? []);
+                            $oldValues = $properties['old'] instanceof \Illuminate\Support\Collection
+                                ? $properties['old']->all()
+                                : (array) ($properties['old'] ?? []);
+                            $newValues = $properties['attributes'] instanceof \Illuminate\Support\Collection
+                                ? $properties['attributes']->all()
+                                : (array) ($properties['attributes'] ?? []);
                             $changedAttributes = array_values(array_unique(array_merge(array_keys($oldValues), array_keys($newValues))));
                             $formatAuditValue = function ($value) {
                                 if (is_array($value) || is_object($value)) {
