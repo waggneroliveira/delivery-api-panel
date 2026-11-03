@@ -6,6 +6,14 @@ class ActivityLogService
 {
     protected $model;
 
+    protected const IGNORED_ATTRIBUTES = [
+        'created_at',
+        'deleted_at',
+        'password',
+        'remember_token',
+        'updated_at',
+    ];
+
     public function __construct($model)
     {
         $this->model = $model;
@@ -13,13 +21,14 @@ class ActivityLogService
 
     public function getLoggableAttributes(): array
     {
-        // Obtém todos os atributos do modelo
-        $attributes = $this->model->getAttributes();
+        $table = $this->model->getTable();
+        $columns = $this->model->getConnection()
+            ->getSchemaBuilder()
+            ->getColumnListing($table);
 
-        // Filtra os atributos que você deseja logar
-        return array_filter(array_keys($attributes), function ($key) {
-            // Exclui propriedades que não devem ser logadas, como 'password'
-            return !in_array($key, ['password', 'created_at', 'updated_at']);
-        });
+        return array_values(array_filter(
+            $columns,
+            fn (string $attribute) => ! in_array($attribute, self::IGNORED_ATTRIBUTES, true)
+        ));
     }
 }
