@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\SettingTheme;
+use App\Models\AuditActivity;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Activitylog\Models\Activity;
 use App\Repositories\AuditCountRepository;
 use App\Repositories\SettingThemeRepository;
 
@@ -23,7 +23,7 @@ class AuditActivityController extends Controller
             return view('admin.error.403', compact('settingTheme'));
         }
 
-        $activities = Activity::with('causer')
+        $activities = AuditActivity::with('causer')
         ->whereHas('causer.roles', function ($query) {
             $query->where('name', '!=', 'Super');
         })
@@ -39,7 +39,7 @@ class AuditActivityController extends Controller
         ]);
     }
 
-    public function show(Activity $activitie)
+    public function show(AuditActivity $activitie)
     {
         if(!Auth::user()->hasRole('Super') && !Auth::user()->can('usuario.tornar usuario master') && !Auth::user()->can('auditoria.visualizar')){
             return view('admin.error.403');
@@ -54,7 +54,7 @@ class AuditActivityController extends Controller
 
     public function markAsRead($id)
     {
-        $auditoria = Activity::findOrFail($id);
+        $auditoria = AuditActivity::findOrFail($id);
         $auditoria->is_read = true;
         $auditoria->save();
 
@@ -66,11 +66,11 @@ class AuditActivityController extends Controller
         $user = auth()->user();
 
         // Marcar todas as notificações como lidas
-        $is_read = Activity::where('causer_id', $user->id)
+        $is_read = AuditActivity::where('causer_id', $user->id)
             ->update(['is_read' => true]); // Atualize o campo correspondente que marca como lido
 
         if (!$is_read) {
-            Activity::where('is_read', false)->update(['is_read' => true]);
+            AuditActivity::where('is_read', false)->update(['is_read' => true]);
         }
         return response()->json(['status' => 'success']);
     }

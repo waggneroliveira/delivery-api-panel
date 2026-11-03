@@ -147,17 +147,54 @@
                         <div>
                             <h5>{{__('blades/audit.old_value')}}</h5>
                         </div>
-                        <code>
-                            {{ print_r($activitie->properties['old'] ?? [], true) }}
-                        </code>
+                        @php
+                            $properties = $activitie->properties instanceof \Illuminate\Support\Collection
+                                ? $activitie->properties->all()
+                                : (array) ($activitie->properties ?? []);
+                            $oldValue = \Illuminate\Support\Arr::get($properties, 'old', []);
+                            $newValue = \Illuminate\Support\Arr::get($properties, 'attributes', []);
+                            $oldValues = $oldValue instanceof \Illuminate\Support\Collection
+                                ? $oldValue->all()
+                                : (array) $oldValue;
+                            $newValues = $newValue instanceof \Illuminate\Support\Collection
+                                ? $newValue->all()
+                                : (array) $newValue;
+                            $changedAttributes = array_values(array_unique(array_merge(array_keys($oldValues), array_keys($newValues))));
+                            $formatAuditValue = function ($value) {
+                                if (is_array($value) || is_object($value)) {
+                                    return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+                                }
+
+                                if ($value === null) {
+                                    return 'null';
+                                }
+
+                                return is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
+                            };
+                        @endphp
+                        @if (empty($changedAttributes))
+                            <code>-</code>
+                        @else
+                            @foreach ($changedAttributes as $attribute)
+                                <div><strong>{{ $attribute }}:</strong>
+                                    <code>{{ $formatAuditValue(array_key_exists($attribute, $oldValues) ? $oldValues[$attribute] : null) }}</code>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                     <div class="mb-2">
                         <div>
                             <h5>{{__('blades/audit.new_value')}}</h5>
                         </div>
-                        <code>
-                            {{ print_r($activitie->properties['attributes'] ?? [], true) }}
-                        </code>
+                        @if (empty($changedAttributes))
+                            <code>-</code>
+                        @else
+                            @foreach ($changedAttributes as $attribute)
+                                <div><strong>{{ $attribute }}:</strong>
+                                    <code>{{ $formatAuditValue(array_key_exists($attribute, $newValues) ? $newValues[$attribute] : null) }}</code>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div> <!-- end card-body-->
 

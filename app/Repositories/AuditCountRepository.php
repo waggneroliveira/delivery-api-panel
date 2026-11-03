@@ -2,7 +2,7 @@
 namespace App\Repositories;
 
 use Illuminate\Support\Facades\Auth;
-use Spatie\Activitylog\Models\Activity;
+use App\Models\AuditActivity;
 
 class AuditCountRepository
 {
@@ -10,7 +10,7 @@ class AuditCountRepository
     {
         $today = today();
 
-        return Activity::with('causer')
+        return AuditActivity::with('causer')
         ->whereHas('causer.roles', function ($query) {
             $query->where('name', '!=', 'Super');
         })
