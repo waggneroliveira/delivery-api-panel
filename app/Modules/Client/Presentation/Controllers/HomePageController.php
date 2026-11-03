@@ -80,15 +80,15 @@ class HomePageController
         return response()->json(['html' => $html]);
     }
 
-    public function policePrivacy(ThemeManager $theme): View
+    public function policePrivacy(ThemeManager $theme, WeatherService $weather, FootballDataService $footballDataService): View
     {
-        $data = $this->service->getIndexData($theme);
+        $data = $this->service->getIndexData($theme, $weather, $footballDataService);
 
         return view($theme->view('privacy-of-police'), $data);
     }
-    public function useTerm(ThemeManager $theme): View
+    public function useTerm(ThemeManager $theme, WeatherService $weather, FootballDataService $footballDataService): View
     {
-        $data = $this->service->getIndexData($theme);
+        $data = $this->service->getIndexData($theme, $weather, $footballDataService);
 
         return view($theme->view('use-of-term'), $data);
     }
