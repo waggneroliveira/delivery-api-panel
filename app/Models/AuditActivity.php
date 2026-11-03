@@ -2,12 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Models\Activity;
 
-class AuditActivity extends Model
+class AuditActivity extends Activity
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $activity) {
+            $causer = $activity->causer;
+
+            if (! $causer instanceof User && $activity->causer_id === Auth::id()) {
+                $causer = Auth::user();
+            }
+
+            if ($causer instanceof User && $causer->hasRole('Super')) {
+                return false;
+            }
+
+            return true;
+        });
+    }
 
     public static function getModelName($subjectType)
     {
