@@ -1,0 +1,91 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    <!-- RewriteBase /homologacao/ -->
+
+    # Redireciona requisições para index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+
+# Compressão Brotli (se disponível)
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# Compressão GZIP (melhora velocidade e economia de banda)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE font/woff2 font/woff
+  Header append Vary User-Agent env=!dont-vary
+</IfModule>
+
+# Cache inteligente de arquivos estáticos
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+
+  # Imagens
+  ExpiresByType image/webp "access plus 6 months"
+  ExpiresByType image/jpeg "access plus 6 months"
+  ExpiresByType image/png "access plus 6 months"
+  ExpiresByType image/gif "access plus 6 months"
+  ExpiresByType image/svg+xml "access plus 6 months"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType application/pdf "access plus 1 year"
+
+  # Fontes
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+
+  # CSS, JS
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType application/json "access plus 1 month"
+</IfModule>
+
+# Headers para cache, segurança e performance
+<IfModule mod_headers.c>
+  # Cache-Control para HTML (cache leve)
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "public, max-age=600"
+  </FilesMatch>
+
+  # Cache-Control para demais arquivos
+  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|webp|svg|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # CORS para fontes
+  <FilesMatch "\.(woff2|woff)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+
+  # Segurança extra
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+  Header unset X-Powered-By
+  # Cookies SameSite (se usar cookies)
+  Header always edit Set-Cookie ^(.*)$ $1;SameSite=Lax
+</IfModule>
+
+# Evita listagem de diretórios
+Options -Indexes
+
+# Bloqueia arquivos sensíveis
+<FilesMatch "\.(htaccess|htpasswd|ini|phps|fla|psd|log|sh)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
+
+# Remove ETag (para evitar conflitos de cache entre servidores)
+FileETag None
+Header unset ETag
