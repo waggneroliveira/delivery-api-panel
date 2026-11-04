@@ -362,8 +362,6 @@ return [
                     'about',
                     'slides',
                     'topics',
-                    'letsgo',
-                    'testimonials',
                     'services',
                     'benefits',//parametro
                     'faq_session',
