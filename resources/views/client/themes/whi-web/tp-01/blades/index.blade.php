@@ -947,11 +947,13 @@
             <h4>Sua empresa precisa de um site sob medida do zero?</h4>
             <p>Conheça os serviços de desenvolvimento exclusivo da Agência WHI e crie um projeto único para o seu negócio.</p>
           </div>
-          @php
-              $phone = preg_replace('/\D/', '', $contact->whatsapp);
-              $mensagem = "Olá! Encontrei seu site e gostaria de conhecer mais sobre as condições para projetos exclusivos.";
-          @endphp
-          <a href="https://wa.me/55{{ $phone }}?text={{ $mensagem }}" target="_blank" rel="noopener noreferrer" class="tpl-cta-btn">Solicitar Projeto Exclusivo</a>
+          @if (isset($contact) && $contact->whatsapp <> null)
+            @php
+                $phone = preg_replace('/\D/', '', $contact->whatsapp);
+                $mensagem = "Olá! Encontrei seu site e gostaria de conhecer mais sobre as condições para projetos exclusivos.";
+            @endphp
+            <a href="https://wa.me/55{{ $phone }}?text={{ $mensagem }}" target="_blank" rel="noopener noreferrer" class="tpl-cta-btn">Solicitar Projeto Exclusivo</a>
+          @endif
         </div>
 
       </div>
@@ -1113,7 +1115,9 @@
 
             @foreach($contractedPlans as $plan)
                 @php
-                    $phone = preg_replace('/\D/', '', $contact->whatsapp);
+                    if (isset($contact) && $contact->whatsapp <> null) {
+                        $phone = preg_replace('/\D/', '', $contact->whatsapp);
+                    }
                     
                     // 1. Converte entidades HTML (&aacute;, &eacute;, etc.) de volta para caracteres acentuados
                     $textDecodificado = html_entity_decode($plan->text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
@@ -1158,12 +1162,14 @@
                       </div>
                     </div>
 
-                    <a href="https://wa.me/55{{ $phone }}?text={{ $mensagemUrl }}" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      class="btn-plan {{ $plan->popular == 1 ? 'btn-plan-primary' : 'btn-plan-outline' }}">
-                      Assinar {{ $plan->name }}
-                    </a>
+                     @if (isset($contact) && $contact->whatsapp <> null)
+                        <a href="https://wa.me/55{{ $phone }}?text={{ $mensagemUrl }}" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="btn-plan {{ $plan->popular == 1 ? 'btn-plan-primary' : 'btn-plan-outline' }}">
+                        Assinar {{ $plan->name }}
+                        </a>
+                     @endif
                   </div>
                 </div>
             @endforeach

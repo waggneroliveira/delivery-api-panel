@@ -26,10 +26,13 @@ class DashboardService
         ->where('active', true)
         ->whereIn('display_location', ['panel', 'both'])
         ->where(function ($query) use ($tenant) {
-            $query->where('target', 'all')
-                ->orWhereHas('tenants', function ($query) use ($tenant) {
+            $query->where('target', 'all');
+
+            if ($tenant) {
+                $query->orWhereHas('tenants', function ($query) use ($tenant) {
                     $query->where('tenants.id', $tenant->id);
                 });
+            }
         })
         ->where(function ($query) {
             $query->whereNull('starts_at')
@@ -40,9 +43,7 @@ class DashboardService
                 ->orWhere('ends_at', '>=', now());
         })
         ->latest()
-        ->first();
-
-        
+        ->first();        
 
         return compact('user', 'settingTheme', 'theme', 'themeData', 'clients', 'announcement');
     }
