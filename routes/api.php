@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthClientController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Middleware\EnsureClientApiAuthenticated;
 use App\Http\Middleware\EnsureApiJson;
 use App\Http\Middleware\EnsureApiTenant;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,7 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     Route::post('/login', [AuthClientController::class, 'login'])
         ->name('api.client.login');
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(EnsureClientApiAuthenticated::class)->group(function () {
         Route::get('/me', [ClientController::class, 'show'])
             ->name('api.client.show');
         Route::put('/me', [ClientController::class, 'update'])
