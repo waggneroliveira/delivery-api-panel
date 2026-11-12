@@ -7,7 +7,7 @@ class ClientData
     public function __construct(
         public string $name,
         public string $phone,
-        public string $email,
+        public ?string $email,
         public ?string $password = null,
         public bool $active = true,
         public ?string $pathImage = null,
@@ -20,10 +20,10 @@ class ClientData
         return new self(
             name: (string) ($data['name'] ?? ''),
             phone: (string) ($data['phone'] ?? ''),
-            email: (string) ($data['email'] ?? ''),
+            email: $data['email'] ?? null,
             password: $data['password'] ?? null,
             active: (bool) ($data['active'] ?? true),
-            pathImage: $data['path_image'] ?? null,
+            pathImage: is_string($data['path_image'] ?? null) ? $data['path_image'] : null,
             deletePathImage: (bool) ($data['delete_path_image'] ?? false),
         );
     }

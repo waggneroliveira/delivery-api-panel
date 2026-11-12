@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Client;
 use App\Models\Tenant;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -43,6 +44,9 @@ class ClientApiTest extends TestCase
             $table->string('path_image')->nullable();
             $table->timestamps();
         });
+
+        $migration = require database_path('migrations/2026_11_12_114000_allow_delivery_client_self_registration.php');
+        $migration->up();
 
         Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->id();
@@ -86,21 +90,42 @@ class ClientApiTest extends TestCase
         $login->assertJsonMissingPath('data.client.password');
         $token = $login->json('data.token');
 
+        $otherClient = Client::create([
+            'tenant_id' => $tenant->id,
+            'name' => 'Outro Cliente',
+            'phone' => '11777777777',
+            'email' => 'outro@example.com',
+            'password' => Hash::make('not-used-by-delivery-api'),
+            'active' => true,
+        ]);
+
+        $this->withToken($otherClient->createToken('delivery')->plainTextToken)
+            ->patchJson('/api/client/me', ['phone' => '11999999999'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['phone']);
+        Auth::forgetGuards();
+
         $this->withToken($token)
             ->patchJson('/api/client/me', [
                 'name' => 'Ana Silva',
                 'phone' => '11988887777',
+                'email' => 'ana.nova@example.com',
+                'password' => 'new-password-123',
             ])
             ->assertOk()
             ->assertJsonPath('data.name', 'Ana Silva')
-            ->assertJsonPath('data.phone', '11988887777');
+            ->assertJsonPath('data.phone', '11988887777')
+            ->assertJsonPath('data.email', 'ana.nova@example.com');
+
+        $this->assertDatabaseHas('clients', ['email' => 'ana.nova@example.com']);
+        $this->assertTrue(Hash::check('new-password-123', $client->fresh()->password));
 
         $this->withToken($token)
             ->deleteJson('/api/client/me')
             ->assertOk()
             ->assertJsonPath('message', 'Conta excluída com sucesso.');
 
-        $this->assertDatabaseMissing('clients', ['email' => 'ana@example.com']);
+        $this->assertDatabaseMissing('clients', ['id' => $client->id]);
         $this->assertDatabaseMissing('personal_access_tokens', [
             'tokenable_id' => $client->id,
         ]);
@@ -132,11 +157,50 @@ class ClientApiTest extends TestCase
         $this->postJson('/api/client/login', [
             'name' => 'Conta inativa',
             'phone' => '11911111111',
-        ])->assertUnauthorized();
+        ])->assertForbidden();
 
         $this->get('/api/client/me')
             ->assertUnauthorized()
             ->assertHeader('content-type', 'application/json')
             ->assertJson(['message' => 'Não autenticado.']);
+    }
+
+    public function test_login_creates_new_account_and_rejects_a_phone_with_a_different_name(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $this->postJson('/api/client/login', [
+            'name' => 'Ana Cliente',
+            'phone' => '11999999999',
+        ])->assertCreated()
+            ->assertJsonPath('message', 'Conta criada e login realizado com sucesso.')
+            ->assertJsonPath('data.client.email', null);
+
+        $this->postJson('/api/client/login', [
+            'name' => 'Ana Cliente',
+            'phone' => '11999999999',
+        ])->assertOk()
+            ->assertJsonPath('message', 'Login realizado com sucesso.');
+
+        $this->postJson('/api/client/login', [
+            'name' => 'Outro Nome',
+            'phone' => '11999999999',
+        ])->assertStatus(409)
+            ->assertJsonPath('message', 'O telefone informado já está associado a outro nome.');
+
+        $this->assertDatabaseCount('clients', 1);
+        $this->assertDatabaseHas('clients', [
+            'name' => 'Ana Cliente',
+            'phone' => '11999999999',
+            'email' => null,
+            'password' => null,
+            'active' => true,
+        ]);
     }
 }

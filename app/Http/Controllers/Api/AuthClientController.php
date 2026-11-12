@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -25,27 +26,66 @@ class AuthClientController extends Controller
             ], 422);
         }
 
+        $data = $validator->validated();
         $client = Client::query()
-            ->where('name', $validator->validated()['name'])
-            ->where('phone', $validator->validated()['phone'])
-            ->where('active', true)
+            ->where('phone', $data['phone'])
             ->first();
 
-        if (! $client) {
-            return response()->json([
-                'message' => 'Nome ou telefone inválidos, ou conta inativa.',
-            ], 401);
+        if ($client) {
+            return $this->authenticateExistingClient($client, $data['name']);
         }
 
+        try {
+            $client = Client::create([
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'email' => null,
+                'password' => null,
+                'active' => true,
+            ]);
+        } catch (QueryException $exception) {
+            $client = Client::query()
+                ->where('phone', $data['phone'])
+                ->first();
+
+            if (! $client) {
+                throw $exception;
+            }
+
+            return $this->authenticateExistingClient($client, $data['name']);
+        }
+
+        return $this->issueToken($client, 'Conta criada e login realizado com sucesso.', 201);
+    }
+
+    private function authenticateExistingClient(Client $client, string $name): JsonResponse
+    {
+        if ($client->name !== $name) {
+            return response()->json([
+                'message' => 'O telefone informado já está associado a outro nome.',
+            ], 409);
+        }
+
+        if (! $client->active) {
+            return response()->json([
+                'message' => 'Esta conta está inativa.',
+            ], 403);
+        }
+
+        return $this->issueToken($client, 'Login realizado com sucesso.');
+    }
+
+    private function issueToken(Client $client, string $message, int $status = 200): JsonResponse
+    {
         $token = $client->createToken('delivery')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login realizado com sucesso.',
+            'message' => $message,
             'data' => [
                 'token' => $token,
                 'client' => $this->clientData($client),
             ],
-        ]);
+        ], $status);
     }
 
     public function logout(Request $request): JsonResponse

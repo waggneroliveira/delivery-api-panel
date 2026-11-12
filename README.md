@@ -23,7 +23,7 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Delivery client API
 
-The delivery client API is tenant-scoped by the request domain and always returns JSON. Client accounts authenticate with `name` and `phone`:
+The delivery client API is tenant-scoped by the request domain and always returns JSON. `POST /api/client/login` accepts `name` and `phone` for both registration and login:
 
 ```http
 POST /api/client/login
@@ -35,12 +35,14 @@ Content-Type: application/json
 }
 ```
 
+If the phone is new in the current tenant, the API creates an active account with those fields and returns `201`. If the phone already exists, the name must match; a matching active account receives a token, while a different name is rejected. Email and password can be added later from the profile.
+
 The response contains a Sanctum token. Send it as `Authorization: Bearer <token>` to use the authenticated endpoints:
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `GET` | `/api/client/me` | Read the authenticated account |
-| `PUT` / `PATCH` | `/api/client/me` | Update `name`, `phone`, and/or `email` |
+| `PUT` / `PATCH` | `/api/client/me` | Update `name`, `phone`, `email`, password, or profile image |
 | `DELETE` | `/api/client/me` | Delete the authenticated account |
 | `POST` | `/api/client/logout` | Revoke the current token |
 

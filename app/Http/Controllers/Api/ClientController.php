@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Modules\Client\Business\ClientService;
+use App\Modules\Client\DTO\ClientData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -26,14 +27,25 @@ class ClientController extends Controller
         $client = $this->client($request);
         $validator = Validator::make($request->all(), [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'phone' => ['sometimes', 'required', 'string', 'max:15'],
-            'email' => [
+            'phone' => [
                 'sometimes',
                 'required',
+                'string',
+                'max:15',
+                Rule::unique('clients', 'phone')
+                    ->where('tenant_id', $client->tenant_id)
+                    ->ignore($client->id),
+            ],
+            'email' => [
+                'sometimes',
+                'nullable',
                 'email',
                 'max:255',
                 Rule::unique('clients', 'email')->ignore($client->id),
             ],
+            'password' => ['sometimes', 'nullable', 'string', 'min:8'],
+            'path_image' => ['sometimes', 'nullable', 'file', 'image', 'max:2048'],
+            'delete_path_image' => ['sometimes', 'boolean'],
         ]);
 
         if ($validator->fails()) {
@@ -45,13 +57,24 @@ class ClientController extends Controller
 
         $changes = $validator->validated();
 
-        if (! $changes) {
+        if (! $changes && ! $request->hasFile('path_image')) {
             return response()->json([
                 'message' => 'Informe ao menos um dado para atualizar.',
             ], 422);
         }
 
-        $client->fill($changes)->save();
+        $clientData = ClientData::fromArray(array_merge([
+            'name' => $client->name,
+            'phone' => $client->phone,
+            'email' => $client->email,
+            'active' => $client->active,
+        ], $changes));
+
+        $this->service->update(
+            $client,
+            $clientData,
+            $request->file('path_image')
+        );
 
         return response()->json([
             'message' => 'Dados atualizados com sucesso.',
