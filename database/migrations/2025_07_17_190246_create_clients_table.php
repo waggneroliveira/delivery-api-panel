@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->constrained();
             $table->string('name');
+            $table->string('phone', 15);
             $table->string('email')->unique();
             $table->boolean('active')->default(0);
             $table->string('password');
