@@ -268,7 +268,7 @@
 
         <!-- device image -->
         <div class="device">
-            <img src="{{asset('build/client/images/themes/whi-web/device.png')}}" alt="image" height="250" loading="lazy">
+            <img src="{{asset('build/client/images/themes/delivery/device.png')}}" alt="image" height="250" loading="lazy">
         </div>
 
     </section>
@@ -403,7 +403,7 @@
                         <aside class="ww-sidebar">
                             <div class="ww-sidebar-bg">
                                 <div class="ww-brand-row justify-content-center">
-                                    <img src="{{asset('build/client/images/themes/whi-web/whi-black-horizontal.png')}}" alt="Whi web" height="40">
+                                    <img src="{{asset('build/client/images/themes/delivery/whi-black-horizontal.png')}}" alt="Whi web" height="40">
                                 </div>
                                 <div class="ww-nav-label">Listagem</div>
                                 <a href="#" class="ww-nav-link active"
@@ -556,7 +556,7 @@
                     <div class="ww-login-card">
                         <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                             <div class="justify-content-center">
-                                <img src="{{asset('build/client/images/themes/whi-web/whi-black-horizontal.png')}}" alt="Whi web" height="40">
+                                <img src="{{asset('build/client/images/themes/delivery/whi-black-horizontal.png')}}" alt="Whi web" height="40">
                             </div>
                         </div>
                         <strong class="d-block">Acessar conta</strong
@@ -617,7 +617,7 @@
                             class="app-navbar d-flex align-items-center justify-content-between py-1 px-2 rounded-1 mb-2"
                         >
                             <div class="ww-tabletbar p-0 d-flex align-items-center gap-2">
-                              <img src="{{asset('build/client/images/themes/whi-web/favicon-whi.png')}}" alt="Whi web" height="20">
+                              <img src="{{asset('build/client/images/themes/delivery/favicon-whi.png')}}" alt="Whi web" height="20">
                                 <i class="bi bi-list text-white font-18 ms-2"></i>
                             </div>
                             <div class="d-flex align-items-center gap-2">

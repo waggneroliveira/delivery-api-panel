@@ -198,7 +198,7 @@
     </noscript>
 
     <link href="{{ asset('build/client/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('build/client/themes/whi-web/tp-01/css/style.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('build/client/themes/delivery/tp-01/css/style.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('build/client/css/default.css') }}" rel="stylesheet" type="text/css">
     <link rel="preload" href="{{ asset('build/client/lgpd/style.css') }}" as="style"  onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
@@ -225,7 +225,7 @@
 
     @include('client/script-seo-google/script-body-nocript')
 
-    @include('client/themes/whi-web/tp-01/includes/lgpd/lgpd')
+    @include('client/themes/delivery/tp-01/includes/lgpd/lgpd')
 
     {{-- Preloader --}}
     <div id="preloader">
@@ -653,7 +653,7 @@
                         <div class="d-flex justify-content-center justify-content-lg-end align-items-center gap-3">
                             <a href="http://whiweb.com.br/" target="_blank" rel="noopener noreferrer" class="text-color-footer text-decoration-none d-flex align-items-center gap-2">
                                 <span class="font-13">Sistema</span>
-                                <img src="{{asset('build/client/themes/default/images/whi-web.png')}}" title="Whi Web" alt="WHI Web" height="50" class="logo-system" loading="lazy">
+                                <img src="{{asset('build/client/themes/default/images/delivery.png')}}" title="Whi Web" alt="WHI Web" height="50" class="logo-system" loading="lazy">
                             </a>
 
                             <span class="text-color-footer opacity-50">|</span>
@@ -733,11 +733,11 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script defer src="{{ asset('build/client/bootstrap/js/bootstrap.bundle.js') }}"></script>
     <script defer src="{{ asset('build/client/lgpd/script.js') }}"></script>
-    <script defer src="{{ asset('build/client/themes/whi-web/tp-01/js/jquery.js') }}"></script>
-    <script defer src="{{ asset('build/client/themes/whi-web/tp-01/js/typed.min.js') }}"></script>
-    <script defer src="{{ asset('build/client/themes/whi-web/tp-01/js/functions-site.js') }}"></script>
-    <script defer src="{{ asset('build/client/themes/whi-web/tp-01/js/gsap-efect.js') }}"></script>
-    <script defer src="{{ asset('build/client/themes/whi-web/tp-01/js/main.js') }}"></script>
+    <script defer src="{{ asset('build/client/themes/delivery/tp-01/js/jquery.js') }}"></script>
+    <script defer src="{{ asset('build/client/themes/delivery/tp-01/js/typed.min.js') }}"></script>
+    <script defer src="{{ asset('build/client/themes/delivery/tp-01/js/functions-site.js') }}"></script>
+    <script defer src="{{ asset('build/client/themes/delivery/tp-01/js/gsap-efect.js') }}"></script>
+    <script defer src="{{ asset('build/client/themes/delivery/tp-01/js/main.js') }}"></script>
     <script defer src="{{ asset('build/client/js/default.js') }}"></script>
 
     @php
