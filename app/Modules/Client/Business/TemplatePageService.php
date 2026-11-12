@@ -38,7 +38,7 @@ class TemplatePageService
             ->first();
 
         if (!$templateThemeInner) {
-            return ['view' => 'client.themes.whi-web.tp-01.errors.404'];
+            return ['view' => 'client.themes.delivery.tp-01.errors.404'];
         }
 
         $tenantTheme = Tenant::current();
