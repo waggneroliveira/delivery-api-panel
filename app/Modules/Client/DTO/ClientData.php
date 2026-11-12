@@ -6,6 +6,7 @@ class ClientData
 {
     public function __construct(
         public string $name,
+        public string $phone,
         public string $email,
         public ?string $password = null,
         public bool $active = true,
@@ -18,6 +19,7 @@ class ClientData
     {
         return new self(
             name: (string) ($data['name'] ?? ''),
+            phone: (string) ($data['phone'] ?? ''),
             email: (string) ($data['email'] ?? ''),
             password: $data['password'] ?? null,
             active: (bool) ($data['active'] ?? true),
@@ -30,6 +32,7 @@ class ClientData
     {
         $payload = [
             'name' => $this->name,
+            'phone' => $this->phone,
             'email' => $this->email,
             'active' => $this->active,
         ];

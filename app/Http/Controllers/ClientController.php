@@ -47,7 +47,6 @@ class ClientController extends Controller
 
     public function update(UpdateClientRequest $request, Client $client): RedirectResponse
     {
-        $client = auth('client')->user();
         $clientData = ClientData::fromArray($request->validated());
         $imageFile = $request->hasFile('path_image') ? $request->file('path_image') : null;
 

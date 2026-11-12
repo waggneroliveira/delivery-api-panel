@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Client extends Authenticatable
 {
-    use Notifiable, HasFactory, LogsActivity, BelongsToTenant;
+    use HasApiTokens, Notifiable, HasFactory, LogsActivity, BelongsToTenant;
     
     protected $fillable = [
         'name',

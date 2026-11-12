@@ -21,6 +21,31 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Delivery client API
+
+The delivery client API is tenant-scoped by the request domain and always returns JSON. Client accounts authenticate with `name` and `phone`:
+
+```http
+POST /api/client/login
+Content-Type: application/json
+
+{
+  "name": "Ana Cliente",
+  "phone": "11999999999"
+}
+```
+
+The response contains a Sanctum token. Send it as `Authorization: Bearer <token>` to use the authenticated endpoints:
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/client/me` | Read the authenticated account |
+| `PUT` / `PATCH` | `/api/client/me` | Update `name`, `phone`, and/or `email` |
+| `DELETE` | `/api/client/me` | Delete the authenticated account |
+| `POST` | `/api/client/logout` | Revoke the current token |
+
+These API routes are separate from the panel's existing tenant management and web views.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.

@@ -45,7 +45,7 @@ class ClientController
         }
     }
 
-    public function update(UpdateClientRequest $request, Client $client): RedirectResponse
+    public function update(UpdateClientRequest $request): RedirectResponse
     {
         $client = auth('client')->user();
         $clientData = ClientData::fromArray($request->validated());
