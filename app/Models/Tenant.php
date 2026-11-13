@@ -60,6 +60,11 @@ class Tenant extends BaseTenant
         'active',
     ];
 
+    public function scopeActive($query)
+    {
+        return $query->where('active', 1);
+    }
+
     public function templateTheme()
     {
         return $this->belongsTo(TemplateTheme::class);

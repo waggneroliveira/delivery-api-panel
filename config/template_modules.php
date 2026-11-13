@@ -103,7 +103,7 @@ return [
         'limits' => [
             'about' => 1,
             'advantage' => 30,
-            'slides' => 4,
+            'slides' => 1,
             'lineOfTime' => 6,
             'impactSection' => 3,
             'topics' => 4,

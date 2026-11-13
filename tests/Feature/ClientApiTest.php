@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
+use App\Models\Slide;
 use App\Models\Tenant;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +45,15 @@ class ClientApiTest extends TestCase
             $table->boolean('active')->default(false);
             $table->string('password');
             $table->string('path_image')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('slides', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tenant_id');
+            $table->string('path_image')->nullable();
+            $table->boolean('active')->default(false);
+            $table->integer('sorting')->default(0);
             $table->timestamps();
         });
 
@@ -187,6 +197,39 @@ class ClientApiTest extends TestCase
             ->assertJsonPath('data.theme', null)
             ->assertJsonMissingPath('data.tenant.database')
             ->assertJsonMissingPath('data.tenant.plan_id');
+    }
+
+    public function test_slides_api_returns_only_the_image_of_the_first_active_slide(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        Slide::create([
+            'path_image' => 'slides/inactive.avif',
+            'active' => false,
+            'sorting' => 0,
+        ]);
+        Slide::create([
+            'path_image' => 'slides/second.avif',
+            'active' => true,
+            'sorting' => 2,
+        ]);
+        Slide::create([
+            'path_image' => 'slides/first.avif',
+            'active' => true,
+            'sorting' => 1,
+        ]);
+
+        $this->getJson('/api/slides')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => ['path_image' => 'slides/first.avif'],
+            ]);
     }
 
     public function test_login_creates_new_account_and_rejects_a_phone_with_a_different_name(): void

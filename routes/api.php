@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Api\AuthClientController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\ProductCategoryController;
+use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\TenantController;
-use App\Http\Middleware\EnsureClientApiAuthenticated;
 use App\Http\Middleware\EnsureApiJson;
 use App\Http\Middleware\EnsureApiTenant;
+use App\Http\Middleware\EnsureClientApiAuthenticated;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/ping', function () {
@@ -34,3 +36,11 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/tenant', [TenantController::class, 'show'])
     ->name('api.tenant.show');
+
+Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
+    ->get('/slides', [SlideController::class, 'index'])
+    ->name('api.slides.index');
+
+Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
+    ->get('/categoria', [ProductCategoryController::class, 'index'])
+    ->name('api.product-category.index');

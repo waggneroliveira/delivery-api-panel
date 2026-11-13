@@ -49,16 +49,20 @@ class TenantController extends Controller
 
         $theme = $themeManager->theme();
 
+        $themeData = $theme && $theme->active
+            ? $theme->only([
+                'id',
+                'slug',
+                'name',
+                'layout_type',
+                'template_variation',
+            ])
+            : null;
+
         return response()->json([
             'data' => [
                 'tenant' => $tenantData,
-                'theme' => $theme?->only([
-                    'id',
-                    'slug',
-                    'name',
-                    'layout_type',
-                    'template_variation',
-                ]),
+                'theme' => $themeData,
             ],
         ]);
     }
