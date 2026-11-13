@@ -14,9 +14,13 @@ class AuthClientController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
+        $request->merge([
+            'phone' => preg_replace('/\D/', '', $request->input('phone', '')),
+        ]);
+
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:15'],
+            'phone' => ['required', 'string', 'min:10', 'max:11', 'regex:/^[0-9]+$/'],
         ]);
 
         if ($validator->fails()) {
@@ -27,6 +31,7 @@ class AuthClientController extends Controller
         }
 
         $data = $validator->validated();
+
         $client = Client::query()
             ->where('phone', $data['phone'])
             ->first();

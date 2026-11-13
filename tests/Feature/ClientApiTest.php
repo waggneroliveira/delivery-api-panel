@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
+use App\Models\AdSlot;
+use App\Models\Announcement;
 use App\Models\Slide;
 use App\Models\Tenant;
+use App\Models\TemplateTheme;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,9 +33,19 @@ class ClientApiTest extends TestCase
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('domain')->unique();
+            $table->unsignedBigInteger('template_theme_id')->nullable();
             $table->string('primary_color')->nullable();
             $table->string('path_image_logo_header')->nullable();
             $table->boolean('active')->default(true);
+            $table->timestamps();
+        });
+
+        Schema::create('template_themes', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug');
+            $table->string('name');
+            $table->string('layout_type')->nullable();
+            $table->string('template_variation')->nullable();
             $table->timestamps();
         });
 
@@ -55,6 +68,45 @@ class ClientApiTest extends TestCase
             $table->boolean('active')->default(false);
             $table->integer('sorting')->default(0);
             $table->timestamps();
+        });
+
+        Schema::create('ad_slots', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('template_theme_id');
+            $table->string('name');
+            $table->string('slug');
+            $table->string('exhibition');
+            $table->boolean('active')->default(true);
+            $table->unsignedInteger('sorting')->default(0);
+            $table->timestamps();
+        });
+
+        Schema::create('announcements', function (Blueprint $table) {
+            $table->id();
+            $table->text('link')->nullable();
+            $table->string('path_image')->nullable();
+            $table->string('path_image_mobile')->nullable();
+            $table->string('path_image_vertical')->nullable();
+            $table->boolean('active')->default(false);
+            $table->integer('sorting')->default(0);
+            $table->string('target')->default('all');
+            $table->string('display_location')->default('web');
+            $table->string('type')->default('general');
+            $table->dateTime('starts_at')->nullable();
+            $table->dateTime('ends_at')->nullable();
+            $table->text('text')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('announcement_ad_slots', function (Blueprint $table) {
+            $table->unsignedBigInteger('announcement_id');
+            $table->unsignedBigInteger('ad_slot_id');
+            $table->timestamps();
+        });
+
+        Schema::create('announcement_tenants', function (Blueprint $table) {
+            $table->unsignedBigInteger('announcement_id');
+            $table->unsignedBigInteger('tenant_id');
         });
 
         $migration = require database_path('migrations/2026_11_12_114000_allow_delivery_client_self_registration.php');
@@ -230,6 +282,59 @@ class ClientApiTest extends TestCase
             ->assertExactJson([
                 'data' => ['path_image' => 'slides/first.avif'],
             ]);
+    }
+
+    public function test_announcements_api_returns_current_panel_announcements_by_ad_slot(): void
+    {
+        $theme = TemplateTheme::create([
+            'slug' => 'delivery',
+            'name' => 'Delivery',
+            'layout_type' => 'onepage',
+            'template_variation' => 'tp-01',
+        ]);
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'template_theme_id' => $theme->id,
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $adSlot = AdSlot::create([
+            'template_theme_id' => $theme->id,
+            'name' => 'Banner delivery',
+            'slug' => 'banner-delivery',
+            'exhibition' => 'horizontal',
+            'active' => true,
+            'sorting' => 1,
+        ]);
+
+        $eligible = Announcement::create([
+            'link' => 'https://example.com/oferta',
+            'path_image' => 'announcements/oferta.webp',
+            'active' => true,
+            'target' => 'all',
+            'display_location' => 'panel',
+            'type' => 'general',
+        ]);
+        $eligible->adSlots()->attach($adSlot->id);
+
+        $webOnly = Announcement::create([
+            'path_image' => 'announcements/site.webp',
+            'active' => true,
+            'target' => 'all',
+            'display_location' => 'web',
+            'type' => 'general',
+        ]);
+        $webOnly->adSlots()->attach($adSlot->id);
+
+        $this->getJson('/api/announcements')
+            ->assertOk()
+            ->assertJsonPath('data.banner-delivery.0.path_image', 'announcements/oferta.webp')
+            ->assertJsonPath('data.banner-delivery.0.link', 'https://example.com/oferta')
+            ->assertJsonMissing(['path_image' => 'announcements/site.webp'])
+            ->assertJsonMissingPath('data.banner-delivery.0.pivot');
     }
 
     public function test_login_creates_new_account_and_rejects_a_phone_with_a_different_name(): void

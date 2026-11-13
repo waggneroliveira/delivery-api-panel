@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthClientController;
+use App\Http\Controllers\Api\AnnoumcementsController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\SlideController;
@@ -44,3 +45,7 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/categoria', [ProductCategoryController::class, 'index'])
     ->name('api.product-category.index');
+
+Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
+    ->get('/announcements', [AnnoumcementsController::class, 'index'])
+    ->name('api.announcements.index');
