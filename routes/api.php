@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthClientController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\TenantController;
 use App\Http\Middleware\EnsureClientApiAuthenticated;
 use App\Http\Middleware\EnsureApiJson;
 use App\Http\Middleware\EnsureApiTenant;
@@ -29,3 +30,7 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
             ->name('api.client.logout');
     });
 });
+
+Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
+    ->get('/tenant', [TenantController::class, 'show'])
+    ->name('api.tenant.show');

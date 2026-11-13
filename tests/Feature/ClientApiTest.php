@@ -29,6 +29,8 @@ class ClientApiTest extends TestCase
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('domain')->unique();
+            $table->string('primary_color')->nullable();
+            $table->string('path_image_logo_header')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
@@ -163,6 +165,28 @@ class ClientApiTest extends TestCase
             ->assertUnauthorized()
             ->assertHeader('content-type', 'application/json')
             ->assertJson(['message' => 'Não autenticado.']);
+    }
+
+    public function test_tenant_api_returns_public_branding_and_theme_configuration(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'primary_color' => '#123456',
+            'path_image_logo_header' => 'uploads/logo.avif',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $this->getJson('/api/tenant')
+            ->assertOk()
+            ->assertJsonPath('data.tenant.name', 'Delivery')
+            ->assertJsonPath('data.tenant.primary_color', '#123456')
+            ->assertJsonPath('data.tenant.path_image_logo_header', 'uploads/logo.avif')
+            ->assertJsonPath('data.theme', null)
+            ->assertJsonMissingPath('data.tenant.database')
+            ->assertJsonMissingPath('data.tenant.plan_id');
     }
 
     public function test_login_creates_new_account_and_rejects_a_phone_with_a_different_name(): void
