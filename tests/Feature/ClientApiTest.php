@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ClientApiTest extends TestCase
@@ -37,6 +38,9 @@ class ClientApiTest extends TestCase
             $table->string('domain')->unique();
             $table->unsignedBigInteger('template_theme_id')->nullable();
             $table->string('primary_color')->nullable();
+            $table->string('secondary_color')->nullable();
+            $table->string('text_color')->nullable();
+            $table->string('bg_header')->nullable();
             $table->string('path_image_logo_header')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
@@ -322,6 +326,32 @@ class ClientApiTest extends TestCase
             ->assertJsonPath('data.theme', null)
             ->assertJsonMissingPath('data.tenant.database')
             ->assertJsonMissingPath('data.tenant.plan_id');
+    }
+
+    public function test_appearance_api_returns_tenant_branding_with_a_short_public_cache(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'primary_color' => '#123456',
+            'secondary_color' => null,
+            'text_color' => '#222222',
+            'bg_header' => '#fef3e5',
+            'path_image_logo_header' => 'uploads/logo.avif',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $this->getJson('/api/appearance')
+            ->assertOk()
+            ->assertHeader('Cache-Control', 'max-age=60, public')
+            ->assertJsonPath('name', 'Delivery')
+            ->assertJsonPath('logo', Storage::disk('public')->url('uploads/logo.avif'))
+            ->assertJsonPath('colors.primary', '#123456')
+            ->assertJsonPath('colors.secondary', '#24211f')
+            ->assertJsonPath('colors.background', '#fef3e5')
+            ->assertJsonPath('colors.text', '#222222');
     }
 
     public function test_slides_api_returns_only_the_image_of_the_first_active_slide(): void

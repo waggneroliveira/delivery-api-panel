@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthClientController;
 use App\Http\Controllers\Api\AnnoumcementsController;
+use App\Http\Controllers\Api\AppearanceController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\SlideController;
@@ -37,6 +38,10 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/tenant', [TenantController::class, 'show'])
     ->name('api.tenant.show');
+
+Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
+    ->get('/appearance', [AppearanceController::class, 'show'])
+    ->name('api.appearance.show');
 
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/slides', [SlideController::class, 'index'])
