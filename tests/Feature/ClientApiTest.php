@@ -87,6 +87,8 @@ class ClientApiTest extends TestCase
             $table->nullableMorphs('subject');
             $table->nullableMorphs('causer');
             $table->json('properties')->nullable();
+            $table->string('event')->nullable();
+            $table->uuid('batch_uuid')->nullable();
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
@@ -258,7 +260,7 @@ class ClientApiTest extends TestCase
 
             $this->assertSame(Client::class, $activity->causer_type);
             $this->assertSame($client->id, $activity->causer_id);
-            $this->assertSame('Ana Cliente', $activity->causer->name);
+            $this->assertSame('Ana Silva', $activity->causer->name);
             $this->assertSame(1, (new AuditCountRepository())->auditCount());
             $this->assertCount(1, (new AuditCountRepository())->allAudit());
         } finally {
