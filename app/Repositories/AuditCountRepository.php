@@ -1,8 +1,9 @@
 <?php
 namespace App\Repositories;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\AuditActivity;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 
 class AuditCountRepository
 {
@@ -11,12 +12,18 @@ class AuditCountRepository
         $today = today();
 
         return AuditActivity::with('causer')
-        ->whereHas('causer.roles', function ($query) {
-            $query->where('name', '!=', 'Super');
-        })
-        ->whereDate('created_at', '=', $today)
-        ->where('is_read', 0)
-        ->orderBy('created_at', 'DESC');
+            ->whereNotNull('causer_type')
+            ->where(function (Builder $query) {
+                $query->whereNotMorphedTo('causer', User::class)
+                    ->orWhereHasMorph('causer', [User::class], function (Builder $userQuery) {
+                        $userQuery->whereHas('roles', function (Builder $roleQuery) {
+                            $roleQuery->where('name', '!=', 'Super');
+                        });
+                    });
+            })
+            ->whereDate('created_at', '=', $today)
+            ->where('is_read', 0)
+            ->orderBy('created_at', 'DESC');
     }
 
     public function allAudit()

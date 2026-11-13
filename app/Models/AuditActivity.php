@@ -40,6 +40,8 @@ class AuditActivity extends Activity
                 return 'Notícias';
             case BlogCategory::class:
                 return 'Categoria de notícias';
+            case Client::class:
+                return 'Clientes';
             case Contact::class:
                 return 'Contato';
             case Direction::class:

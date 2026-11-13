@@ -5,9 +5,11 @@ namespace Tests\Feature;
 use App\Models\Client;
 use App\Models\AdSlot;
 use App\Models\Announcement;
+use App\Models\AuditActivity;
 use App\Models\Slide;
 use App\Models\Tenant;
 use App\Models\TemplateTheme;
+use App\Repositories\AuditCountRepository;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +60,34 @@ class ClientApiTest extends TestCase
             $table->boolean('active')->default(false);
             $table->string('password');
             $table->string('path_image')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
+        });
+
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name');
+        });
+
+        Schema::create('model_has_roles', function (Blueprint $table) {
+            $table->unsignedBigInteger('role_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+        });
+
+        Schema::create('activity_log', function (Blueprint $table) {
+            $table->id();
+            $table->string('log_name')->nullable();
+            $table->text('description');
+            $table->nullableMorphs('subject');
+            $table->nullableMorphs('causer');
+            $table->json('properties')->nullable();
+            $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
 
@@ -193,6 +223,47 @@ class ClientApiTest extends TestCase
         $this->assertDatabaseMissing('personal_access_tokens', [
             'tokenable_id' => $client->id,
         ]);
+    }
+
+    public function test_client_api_updates_are_audited_with_the_authenticated_client_as_causer(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $client = Client::create([
+            'tenant_id' => $tenant->id,
+            'name' => 'Ana Cliente',
+            'phone' => '11999999999',
+            'email' => 'ana@example.com',
+            'password' => Hash::make('not-used-by-delivery-api'),
+            'active' => true,
+        ]);
+
+        activity()->enableLogging();
+
+        try {
+            $this->withToken($client->createToken('delivery')->plainTextToken)
+                ->patchJson('/api/client/me', ['name' => 'Ana Silva'])
+                ->assertOk();
+
+            $activity = AuditActivity::query()
+                ->where('subject_type', Client::class)
+                ->where('subject_id', $client->id)
+                ->firstOrFail();
+
+            $this->assertSame(Client::class, $activity->causer_type);
+            $this->assertSame($client->id, $activity->causer_id);
+            $this->assertSame('Ana Cliente', $activity->causer->name);
+            $this->assertSame(1, (new AuditCountRepository())->auditCount());
+            $this->assertCount(1, (new AuditCountRepository())->allAudit());
+        } finally {
+            activity()->disableLogging();
+        }
     }
 
     public function test_delivery_api_rejects_invalid_login_and_unauthenticated_profile_requests(): void

@@ -31,7 +31,7 @@ class Client extends Authenticatable
         'remember_token',
     ];
 
-    protected static $recordEvents = ['created', 'deleted']; //OBS: Com isso eu evito que, ao deslogar, o activity log registre o evento de update quando eu deslogar
+    protected static $recordEvents = ['created', 'updated', 'deleted'];
 
     public function scopeActive($query){
         return $query->where('active', 1);
