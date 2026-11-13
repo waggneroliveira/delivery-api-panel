@@ -357,7 +357,7 @@ class ClientApiTest extends TestCase
             ]);
     }
 
-    public function test_announcements_api_returns_current_panel_announcements_by_ad_slot(): void
+    public function test_announcements_api_returns_public_announcements_by_ad_slot(): void
     {
         $theme = TemplateTheme::create([
             'slug' => 'delivery',
@@ -388,25 +388,25 @@ class ClientApiTest extends TestCase
             'path_image' => 'announcements/oferta.webp',
             'active' => true,
             'target' => 'all',
-            'display_location' => 'panel',
+            'display_location' => 'web',
             'type' => 'general',
         ]);
         $eligible->adSlots()->attach($adSlot->id);
 
-        $webOnly = Announcement::create([
-            'path_image' => 'announcements/site.webp',
+        $panelOnly = Announcement::create([
+            'path_image' => 'announcements/panel.webp',
             'active' => true,
             'target' => 'all',
-            'display_location' => 'web',
+            'display_location' => 'panel',
             'type' => 'general',
         ]);
-        $webOnly->adSlots()->attach($adSlot->id);
+        $panelOnly->adSlots()->attach($adSlot->id);
 
         $this->getJson('/api/announcements')
             ->assertOk()
             ->assertJsonPath('data.banner-delivery.0.path_image', 'announcements/oferta.webp')
             ->assertJsonPath('data.banner-delivery.0.link', 'https://example.com/oferta')
-            ->assertJsonMissing(['path_image' => 'announcements/site.webp'])
+            ->assertJsonMissing(['path_image' => 'announcements/panel.webp'])
             ->assertJsonMissingPath('data.banner-delivery.0.pivot');
     }
 

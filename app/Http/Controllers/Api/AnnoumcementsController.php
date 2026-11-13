@@ -37,7 +37,7 @@ class AnnoumcementsController extends Controller
                                 'ends_at',
                             ])
                             ->where('active', true)
-                            ->whereIn('display_location', ['panel', 'both'])
+                            ->whereIn('display_location', ['web', 'both'])
                             ->where(function ($query) use ($tenant) {
                                 $query
                                     ->where('target', 'all')
