@@ -13,11 +13,11 @@ class EnsureApiTenant
     {
         $tenant = Tenant::current();
 
-        if (! $tenant) {
+        if (!$tenant) {
             return response()->json(['message' => 'Cliente não encontrado.'], 404);
         }
 
-        if (! $tenant->active) {
+        if (!$tenant->active) {
             return response()->json(['message' => 'Cliente inativo.'], 403);
         }
 
