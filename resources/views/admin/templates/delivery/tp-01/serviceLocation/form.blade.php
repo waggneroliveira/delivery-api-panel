@@ -90,6 +90,25 @@
 
 <script>
     (function () {
+        document.addEventListener('input', function (event) {
+            const feeInput = event.target.closest('[data-neighborhood-fee]');
+            if (!feeInput) {
+                return;
+            }
+
+            const digits = feeInput.value.replace(/\D/g, '');
+
+            if (!digits) {
+                feeInput.value = '';
+                return;
+            }
+
+            const amount = digits.padStart(3, '0');
+            const whole = amount.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            feeInput.value = whole + ',' + amount.slice(-2);
+            feeInput.setSelectionRange(feeInput.value.length, feeInput.value.length);
+        });
+
         const initializeNeighborhoodWidget = function () {
             const widget = document.getElementById(@json($neighborhoodWidgetId));
             if (!widget || widget.dataset.initialized) {
@@ -104,7 +123,7 @@
 
             widget.querySelector('[data-add-neighborhood]').addEventListener('click', function () {
                 const name = nameInput.value.trim();
-                const fee = feeInput.value.trim().replace(',', '.');
+                const fee = feeInput.value.trim().replace(/\./g, '').replace(',', '.');
                 const parsedFee = Number(fee);
 
                 if (!name || !/^\d+(?:\.\d{1,2})?$/.test(fee) || !Number.isFinite(parsedFee)) {
