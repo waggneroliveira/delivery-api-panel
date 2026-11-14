@@ -19,7 +19,7 @@
         <div class="input-group mb-2">
             <input type="text" class="form-control" data-neighborhood-name placeholder="Nome do bairro">
             <span class="input-group-text">R$</span>
-            <input type="number" class="form-control" data-neighborhood-fee placeholder="Taxa" min="0" step="0.01" style="max-width: 150px">
+            <input type="text" class="form-control" data-neighborhood-fee inputmode="decimal" placeholder="0,00" autocomplete="off" style="max-width: 150px">
             <button type="button" class="btn btn-primary text-black" data-add-neighborhood>Adicionar</button>
         </div>
         <div class="d-flex flex-wrap gap-2" data-neighborhood-list>
@@ -104,10 +104,10 @@
 
             widget.querySelector('[data-add-neighborhood]').addEventListener('click', function () {
                 const name = nameInput.value.trim();
-                const fee = feeInput.value;
+                const fee = feeInput.value.trim().replace(',', '.');
                 const parsedFee = Number(fee);
 
-                if (!name || fee === '' || !Number.isFinite(parsedFee) || parsedFee < 0) {
+                if (!name || !/^\d+(?:\.\d{1,2})?$/.test(fee) || !Number.isFinite(parsedFee)) {
                     if (!name) {
                         nameInput.focus();
                     } else {
@@ -140,7 +140,7 @@
                 const feeField = document.createElement('input');
                 feeField.type = 'hidden';
                 feeField.name = 'neighborhoods[' + nextIndex + '][delivery_fee]';
-                feeField.value = fee;
+                feeField.value = parsedFee.toFixed(2);
 
                 item.append(label, removeButton, nameField, feeField);
                 list.appendChild(item);
