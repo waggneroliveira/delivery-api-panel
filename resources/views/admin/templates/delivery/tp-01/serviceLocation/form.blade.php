@@ -3,31 +3,31 @@
 @endphp
 <div class="row g-3">
     <div class="mb-3 col-12">
-        <label for="title" class="form-label">Título</label>
+        <label for="title" class="form-label">Cidade/Município</label>
         <input 
             type="text" 
             name="title" 
             class="form-control" 
             id="title{{ isset($serviceLocation->id) ? $serviceLocation->id : '' }}" 
             value="{{ isset($serviceLocation) ? $serviceLocation->title : '' }}" 
-            placeholder="Digite seu nome"
+            placeholder="Cidade/Município"
         >
     </div>
 </div>
-<div class="row">    
+{{-- <div class="row">    
     <div class="mb-3 col-12">
         <label for="{{$textareaId}}" class="form-label text-white">Descrição</label>
         <textarea name="description" id="{{$textareaId}}" placeholder="Texto" class="col-12" rows="10">
             {!!isset($serviceLocation->description)?$serviceLocation->description: ''!!}
         </textarea>
     </div>
-</div>
+</div> --}}
 
-<div class="col-lg-12 mb-3">
-    <label for="path_image" class="form-label">Imagem</label>
+{{-- <div class="col-lg-12 mb-3">
+    <label for="path_image" class="form-label">Ícone</label>
     <input type="file" name="path_image" data-plugins="dropify" data-default-file="{{isset($serviceLocation)?$serviceLocation->path_image<>''?url('storage/'.$serviceLocation->path_image):'':''}}"  />
     <p class="text-muted text-center mt-2 mb-0">{{__('dashboard.text_img_size')}} <b class="text-danger">2 MB</b>.</p>
-</div>
+</div> --}}
 
 <div class="mb-3 col-12">
     <div class="form-check">
