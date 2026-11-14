@@ -48,4 +48,15 @@ class Client extends Authenticatable
     {
         $this->notify(new ClientResetPasswordNotification($token));
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(CustomerAddress::class);
+    }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(CustomerAddress::class)
+            ->where('is_default', true);
+    }
 }
