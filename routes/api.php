@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AnnoumcementsController;
 use App\Http\Controllers\Api\AppearanceController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\CustomerAddress;
 use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\ServiceLocationController;
 use App\Http\Controllers\Api\SlideController;
@@ -34,6 +35,17 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
             ->name('api.client.destroy');
         Route::post('/logout', [AuthClientController::class, 'logout'])
             ->name('api.client.logout');
+        Route::get('/addresses', [CustomerAddress::class, 'index'])
+            ->name('api.client.addresses.index');
+        Route::post('/addresses', [CustomerAddress::class, 'store'])
+            ->name('api.client.addresses.store');
+        Route::get('/addresses/{address}', [CustomerAddress::class, 'show'])
+            ->name('api.client.addresses.show');
+        Route::put('/addresses/{address}', [CustomerAddress::class, 'update'])
+            ->name('api.client.addresses.update');
+        Route::patch('/addresses/{address}', [CustomerAddress::class, 'update']);
+        Route::delete('/addresses/{address}', [CustomerAddress::class, 'destroy'])
+            ->name('api.client.addresses.destroy');
     });
 });
 

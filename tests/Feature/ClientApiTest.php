@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\AdSlot;
 use App\Models\Announcement;
 use App\Models\AuditActivity;
+use App\Models\CustomerAddress;
 use App\Models\Slide;
 use App\Models\Tenant;
 use App\Models\TemplateTheme;
@@ -147,6 +148,23 @@ class ClientApiTest extends TestCase
 
         $migration = require database_path('migrations/2026_11_12_114000_allow_delivery_client_self_registration.php');
         $migration->up();
+
+        Schema::create('customer_addresses', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('client_id')->constrained()->cascadeOnDelete();
+            $table->string('title')->default('Casa');
+            $table->string('recipient_name');
+            $table->string('zip_code', 9);
+            $table->string('state', 2);
+            $table->string('city');
+            $table->string('neighborhood');
+            $table->string('street');
+            $table->string('number');
+            $table->string('complement')->nullable();
+            $table->text('reference')->nullable();
+            $table->boolean('is_default')->default(false);
+            $table->timestamps();
+        });
 
         Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->id();
@@ -303,6 +321,128 @@ class ClientApiTest extends TestCase
         $this->get('/api/client/me')
             ->assertUnauthorized()
             ->assertHeader('content-type', 'application/json')
+            ->assertJson(['message' => 'Não autenticado.']);
+    }
+
+    public function test_authenticated_client_can_manage_up_to_two_private_addresses(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $client = Client::create([
+            'tenant_id' => $tenant->id,
+            'name' => 'Ana Cliente',
+            'phone' => '11999999999',
+            'email' => 'ana@example.com',
+            'password' => Hash::make('not-used-by-delivery-api'),
+            'active' => true,
+        ]);
+        $otherClient = Client::create([
+            'tenant_id' => $tenant->id,
+            'name' => 'Outro Cliente',
+            'phone' => '11777777777',
+            'email' => 'outro@example.com',
+            'password' => Hash::make('not-used-by-delivery-api'),
+            'active' => true,
+        ]);
+
+        $token = $client->createToken('delivery')->plainTextToken;
+        $payload = [
+            'recipient_name' => 'Ana Cliente',
+            'zip_code' => '12345-678',
+            'state' => 'sp',
+            'city' => 'São Paulo',
+            'neighborhood' => 'Centro',
+            'street' => 'Rua A',
+            'number' => '10',
+            'is_default' => true,
+        ];
+
+        $firstAddress = $this->withToken($token)
+            ->postJson('/api/client/addresses', $payload)
+            ->assertCreated()
+            ->assertJsonPath('data.title', 'Casa')
+            ->assertJsonPath('data.state', 'SP')
+            ->assertJsonPath('data.is_default', true)
+            ->json('data.id');
+
+        $secondAddress = $this->withToken($token)
+            ->postJson('/api/client/addresses', array_merge($payload, [
+                'title' => 'Trabalho',
+                'is_default' => true,
+            ]))
+            ->assertCreated()
+            ->assertJsonPath('data.is_default', true)
+            ->json('data.id');
+
+        $this->assertDatabaseHas('customer_addresses', [
+            'id' => $firstAddress,
+            'is_default' => false,
+        ]);
+        $this->assertDatabaseHas('customer_addresses', [
+            'id' => $secondAddress,
+            'is_default' => true,
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/client/addresses')
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
+
+        $this->withToken($token)
+            ->postJson('/api/client/addresses', $payload)
+            ->assertUnprocessable();
+        $this->assertDatabaseCount('customer_addresses', 2);
+
+        $this->withToken($token)
+            ->patchJson("/api/client/addresses/{$secondAddress}", [
+                'street' => 'Rua Nova',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.street', 'Rua Nova')
+            ->assertJsonPath('data.is_default', true);
+
+        $foreignAddress = $otherClient->addresses()->create([
+            'recipient_name' => 'Outro Cliente',
+            'zip_code' => '87654-321',
+            'state' => 'RJ',
+            'city' => 'Rio de Janeiro',
+            'neighborhood' => 'Centro',
+            'street' => 'Rua B',
+            'number' => '20',
+        ]);
+
+        $this->withToken($token)
+            ->getJson("/api/client/addresses/{$foreignAddress->id}")
+            ->assertNotFound();
+
+        $this->withToken($token)
+            ->deleteJson("/api/client/addresses/{$secondAddress}")
+            ->assertOk();
+        $this->assertDatabaseMissing('customer_addresses', ['id' => $secondAddress]);
+    }
+
+    public function test_customer_address_routes_require_client_authentication(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $this->getJson('/api/client/addresses')
+            ->assertUnauthorized()
+            ->assertJson(['message' => 'Não autenticado.']);
+
+        $this->postJson('/api/client/addresses', [])
+            ->assertUnauthorized()
             ->assertJson(['message' => 'Não autenticado.']);
     }
 
