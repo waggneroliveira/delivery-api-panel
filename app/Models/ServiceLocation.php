@@ -19,6 +19,11 @@ class ServiceLocation extends Model
         'description',
         'path_image',
         'active',
+        'neighborhoods',
+    ];
+
+    protected $casts = [
+        'neighborhoods' => 'array',
     ];
 
      public function scopeActive($query){

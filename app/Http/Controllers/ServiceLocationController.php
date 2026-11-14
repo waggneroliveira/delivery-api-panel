@@ -44,7 +44,21 @@ class ServiceLocationController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'title' => ['nullable', 'string', 'max:255'],
+            'neighborhoods' => ['nullable', 'array'],
+            'neighborhoods.*.name' => ['required', 'string', 'max:255'],
+            'neighborhoods.*.delivery_fee' => ['required', 'numeric', 'min:0'],
+        ]);
+
         $data = $request->except(['path_image']);
+        $data['neighborhoods'] = array_values(array_map(
+            static fn (array $neighborhood) => [
+                'name' => trim($neighborhood['name']),
+                'delivery_fee' => (float) $neighborhood['delivery_fee'],
+            ],
+            $validated['neighborhoods'] ?? []
+        ));
         $pathUpload = $this->getPathUpload();
         $manager = new ImageManager(new ImagickDriver());
 
@@ -113,7 +127,21 @@ class ServiceLocationController extends Controller
 
     public function update(Request $request, ServiceLocation $serviceLocation)
     {
+        $validated = $request->validate([
+            'title' => ['nullable', 'string', 'max:255'],
+            'neighborhoods' => ['nullable', 'array'],
+            'neighborhoods.*.name' => ['required', 'string', 'max:255'],
+            'neighborhoods.*.delivery_fee' => ['required', 'numeric', 'min:0'],
+        ]);
+
         $data = $request->except('path_image');
+        $data['neighborhoods'] = array_values(array_map(
+            static fn (array $neighborhood) => [
+                'name' => trim($neighborhood['name']),
+                'delivery_fee' => (float) $neighborhood['delivery_fee'],
+            ],
+            $validated['neighborhoods'] ?? []
+        ));
         $pathUpload = $this->getPathUpload();
         $manager = new ImageManager(new ImagickDriver());
 
