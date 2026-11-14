@@ -1,42 +1,19 @@
 @php
     $textareaId = $textareaId ?? 'text' . (isset($contact->id) ? $contact->id : '');
+    $weekDays = [
+        1 => 'Segunda-feira',
+        2 => 'Terça-feira',
+        3 => 'Quarta-feira',
+        4 => 'Quinta-feira',
+        5 => 'Sexta-feira',
+        6 => 'Sábado',
+        7 => 'Domingo',
+    ];
+    $openingHoursByDay = collect($openingHours ?? [])->keyBy('day_of_week');
 @endphp
 
 <div class="container">
     <div class="row">
-        {{-- Sessão --}}
-        <div class="col-12">
-            <h4 class="page-title">Informações da sessão</h4>
-            <div class="card card-body">
-                <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <label for="name_section" class="form-label">Nome da sessão</label>
-                        <input type="text" name="name_section" class="form-control" id="name_section"
-                            value="{{ $contact->name_section ?? '' }}" placeholder="Nome da sessão">
-                    </div>
-                    <div class="col-12 col-md-8">
-                        <label for="text" class="form-label">Texto</label>
-                        <input type="text" name="text" class="form-control" id="text"
-                            value="{{ $contact->text ?? '' }}" placeholder="Texto">
-                    </div>
-                    <div class="col-12">
-                        <label for="maps" class="form-label">Link mapa</label>
-                        <input type="text" name="maps" class="form-control" id="maps"
-                        value="{{ $contact->maps ?? '' }}" placeholder="Mapa">
-                        <div class="instructions">
-                            <h5>Como usar:</h5>
-                            <ol>
-                                <li>Vá ao Google Maps e encontre o local desejado</li>
-                                <li>Clique no botão "Compartilhar" e depois em "Incorporar um mapa"</li>
-                                <li>Selecione e copie todo o código iframe</li>
-                                <li>Cole o código no campo acima - o link será extraído automaticamente</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         {{-- Redes sociais --}}
         <div class="col-12">
             <h4 class="page-title">Informações das redes sociais</h4>
@@ -53,7 +30,7 @@
                         <input type="text" name="link_insta" class="form-control" id="link_insta"
                             value="{{ $contact->link_insta ?? '' }}" placeholder="Link Instagram">
                     </div>
-                    {{-- <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-6">
                         <label for="link_x" class="form-label">Link X</label>
                         <input type="text" name="link_x" class="form-control" id="link_x"
                             value="{{ $contact->link_x ?? '' }}" placeholder="Link X">
@@ -63,7 +40,7 @@
                         <label for="link_youtube" class="form-label">Link Youtube</label>
                         <input type="text" name="link_youtube" class="form-control" id="link_youtube"
                             value="{{ $contact->link_youtube ?? '' }}" placeholder="Link Youtube">
-                    </div> --}}
+                    </div>
                     <div class="col-12 col-md-6">
                         <label for="link_face" class="form-label">Link Facebook</label>
                         <input type="text" name="link_face" class="form-control" id="link_face"
@@ -84,20 +61,15 @@
             <h4 class="page-title">Informações de contato</h4>
 
             <div class="row">
-                <div class="mb-3 col-lg-4">
+                <div class="mb-3 col-lg-6">
                     <label for="name_one" class="form-label">E-mail</label>
                     <input type="text" name="name_one" class="form-control" id="name_one"
                         value="{{ isset($contact)?$contact->name_one:'' }}" placeholder="E-mail">
                 </div>
-                <div class="mb-3 col-lg-4">
+                <div class="mb-3 col-lg-6">
                     <label for="phone_one" class="form-label">Telefone</label>
                     <input type="text" name="phone_one" class="form-control" id="phone_one"
                         value="{{ isset($contact)?$contact->phone_one:'' }}" placeholder="Telefone">
-                </div>
-                <div class="mb-3 col-lg-4">
-                    <label for="opening_hours_two" class="form-label">Horário de funcionamento</label>
-                    <input type="text" name="opening_hours_two" class="form-control" id="opening_hours_two"
-                        value="{{ isset($contact)?$contact->opening_hours_two:'' }}" placeholder="Horário de funcionamento">
                 </div>
                 <div class="col-12">
                     <label for="address_one" class="form-label">Endereço</label>
@@ -105,6 +77,71 @@
                         value="{{ isset($contact)?$contact->address_one:'' }}" placeholder="Endereço">
                 </div>
             </div> 
+        </div>
+
+        <div class="col-12">
+            <h4 class="page-title">Horários por dia da semana</h4>
+            <div class="card card-body">
+                <div class="row g-3">
+                    @foreach ($weekDays as $dayOfWeek => $dayLabel)
+                        @php
+                            $openingHour = $openingHoursByDay->get($dayOfWeek);
+                            $isClosed = old(
+                                "opening_hours.{$dayOfWeek}.is_closed",
+                                (bool) ($openingHour->is_closed ?? false)
+                            );
+                            $openTime = $openingHour?->open_time
+                                ? substr((string) $openingHour->open_time, 0, 5)
+                                : '';
+                            $closeTime = $openingHour?->close_time
+                                ? substr((string) $openingHour->close_time, 0, 5)
+                                : '';
+                        @endphp
+                        <div class="col-12">
+                            <div class="row align-items-end g-2">
+                                <input type="hidden" name="opening_hours[{{ $dayOfWeek }}][day_of_week]" value="{{ $dayOfWeek }}">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label">{{ $dayLabel }}</label>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="open-time-{{ $dayOfWeek }}" class="form-label">Abertura</label>
+                                    <input
+                                        type="time"
+                                        name="opening_hours[{{ $dayOfWeek }}][open_time]"
+                                        id="open-time-{{ $dayOfWeek }}"
+                                        class="form-control"
+                                        value="{{ old("opening_hours.{$dayOfWeek}.open_time", $openTime) }}"
+                                    >
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="close-time-{{ $dayOfWeek }}" class="form-label">Fechamento</label>
+                                    <input
+                                        type="time"
+                                        name="opening_hours[{{ $dayOfWeek }}][close_time]"
+                                        id="close-time-{{ $dayOfWeek }}"
+                                        class="form-control"
+                                        value="{{ old("opening_hours.{$dayOfWeek}.close_time", $closeTime) }}"
+                                    >
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <input type="hidden" name="opening_hours[{{ $dayOfWeek }}][is_closed]" value="0">
+                                    <div class="form-check">
+                                        <input
+                                            type="checkbox"
+                                            name="opening_hours[{{ $dayOfWeek }}][is_closed]"
+                                            id="is-closed-{{ $dayOfWeek }}"
+                                            class="form-check-input"
+                                            value="1"
+                                            @checked($isClosed)
+                                        >
+                                        <label class="form-check-label" for="is-closed-{{ $dayOfWeek }}">Fechado</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
         </div>
 
     </div>

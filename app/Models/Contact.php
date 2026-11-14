@@ -38,6 +38,14 @@ class Contact extends Model
         'link_youtube',
         'link_face',
         'link_tik_tok',
+        'day_of_week',
+        'open_time',
+        'close_time',
+        'is_closed',
+    ];
+
+    protected $casts = [
+        'is_closed' => 'boolean',
     ];
 
     public function getActivitylogOptions(): LogOptions
