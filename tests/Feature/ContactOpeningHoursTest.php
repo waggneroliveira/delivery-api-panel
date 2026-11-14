@@ -114,6 +114,67 @@ class ContactOpeningHoursTest extends TestCase
         ]);
     }
 
+    public function test_contacts_api_returns_individual_hours_for_the_current_tenant(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $otherTenant = Tenant::create([
+            'name' => 'Other Delivery',
+            'slug' => 'other-delivery',
+            'domain' => 'other.localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        DB::table('contacts')->insert([
+            [
+                'tenant_id' => $tenant->id,
+                'name_one' => 'contato@example.com',
+                'maps' => null,
+                'day_of_week' => 1,
+                'open_time' => '09:00',
+                'close_time' => '17:00',
+                'is_closed' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $tenant->id,
+                'name_one' => 'contato@example.com',
+                'maps' => null,
+                'day_of_week' => 2,
+                'open_time' => '10:00',
+                'close_time' => '18:00',
+                'is_closed' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $otherTenant->id,
+                'name_one' => 'outro@example.com',
+                'maps' => null,
+                'day_of_week' => 1,
+                'open_time' => '08:00',
+                'close_time' => '16:00',
+                'is_closed' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->getJson('/api/contacts')
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.day_of_week', 1)
+            ->assertJsonPath('data.0.open_time', '09:00')
+            ->assertJsonPath('data.1.day_of_week', 2)
+            ->assertJsonPath('data.1.close_time', '18:00');
+    }
+
     private function openingHours(): array
     {
         $openingHours = [];

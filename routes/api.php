@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthClientController;
 use App\Http\Controllers\Api\AnnoumcementsController;
 use App\Http\Controllers\Api\AppearanceController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\ServiceLocationController;
 use App\Http\Controllers\Api\SlideController;
@@ -55,6 +56,10 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/service-locations', [ServiceLocationController::class, 'index'])
     ->name('api.service-locations.index');
+
+Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
+    ->get('/contacts', [ContactController::class, 'index'])
+    ->name('api.contacts.index');
 
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/announcements', [AnnoumcementsController::class, 'index'])
