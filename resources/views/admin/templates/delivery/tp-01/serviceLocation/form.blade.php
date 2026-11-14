@@ -14,7 +14,7 @@
             placeholder="Cidade/Município"
         >
     </div>
-    <div class="mb-3 col-12" id="{{ $neighborhoodWidgetId }}">
+    <div class="mb-3 col-12" id="{{ $neighborhoodWidgetId }}" data-neighborhood-widget>
         <label class="form-label">Bairros e taxas de entrega</label>
         <div class="input-group mb-2">
             <input type="text" class="form-control" data-neighborhood-name placeholder="Nome do bairro">
@@ -96,7 +96,7 @@
                 return;
             }
 
-            const digits = feeInput.value.replace(/\D/g, '');
+            const digits = feeInput.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
 
             if (!digits) {
                 feeInput.value = '';
@@ -109,77 +109,79 @@
             feeInput.setSelectionRange(feeInput.value.length, feeInput.value.length);
         });
 
-        const initializeNeighborhoodWidget = function () {
-            const widget = document.getElementById(@json($neighborhoodWidgetId));
-            if (!widget || widget.dataset.initialized) {
+        document.addEventListener('click', function (event) {
+            const removeButton = event.target.closest('[data-remove-neighborhood]');
+            if (removeButton) {
+                removeButton.closest('[data-neighborhood-item]').remove();
                 return;
             }
 
-            widget.dataset.initialized = 'true';
+            const addButton = event.target.closest('[data-add-neighborhood]');
+            if (!addButton) {
+                return;
+            }
+
+            const widget = addButton.closest('[data-neighborhood-widget]');
             const nameInput = widget.querySelector('[data-neighborhood-name]');
             const feeInput = widget.querySelector('[data-neighborhood-fee]');
             const list = widget.querySelector('[data-neighborhood-list]');
-            let nextIndex = list.querySelectorAll('[data-neighborhood-item]').length;
+            const name = nameInput.value.trim();
+            const fee = feeInput.value.trim().replace(/\./g, '').replace(',', '.');
+            const parsedFee = Number(fee);
 
-            widget.querySelector('[data-add-neighborhood]').addEventListener('click', function () {
-                const name = nameInput.value.trim();
-                const fee = feeInput.value.trim().replace(/\./g, '').replace(',', '.');
-                const parsedFee = Number(fee);
+            if (!name || !/^\d+(?:\.\d{1,2})?$/.test(fee) || !Number.isFinite(parsedFee)) {
+                if (!name) {
+                    nameInput.focus();
+                } else {
+                    feeInput.focus();
+                }
+                return;
+            }
 
-                if (!name || !/^\d+(?:\.\d{1,2})?$/.test(fee) || !Number.isFinite(parsedFee)) {
-                    if (!name) {
-                        nameInput.focus();
-                    } else {
-                        feeInput.focus();
+            const item = document.createElement('span');
+            item.className = 'badge bg-info text-dark d-inline-flex align-items-center gap-2';
+            item.dataset.neighborhoodItem = '';
+
+            const label = document.createElement('span');
+            label.textContent = name + ' - R$ ' + parsedFee.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            const removeBadgeButton = document.createElement('button');
+            removeBadgeButton.type = 'button';
+            removeBadgeButton.className = 'btn-close';
+            removeBadgeButton.dataset.removeNeighborhood = '';
+            removeBadgeButton.setAttribute('aria-label', 'Remover ' + name);
+
+            const nameField = document.createElement('input');
+            nameField.type = 'hidden';
+            nameField.value = name;
+
+            const feeField = document.createElement('input');
+            feeField.type = 'hidden';
+            feeField.value = parsedFee.toFixed(2);
+
+            let nextIndex = Number(widget.dataset.nextIndex);
+            if (!Number.isInteger(nextIndex)) {
+                nextIndex = 0;
+                list.querySelectorAll('input[name^="neighborhoods["]').forEach(function (field) {
+                    const match = field.name.match(/^neighborhoods\[(\d+)\]/);
+                    if (match) {
+                        nextIndex = Math.max(nextIndex, Number(match[1]) + 1);
                     }
-                    return;
-                }
-
-                const item = document.createElement('span');
-                item.className = 'badge bg-info text-dark d-inline-flex align-items-center gap-2';
-                item.dataset.neighborhoodItem = '';
-
-                const label = document.createElement('span');
-                label.textContent = name + ' - R$ ' + parsedFee.toLocaleString('pt-BR', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
                 });
+            }
 
-                const removeButton = document.createElement('button');
-                removeButton.type = 'button';
-                removeButton.className = 'btn-close';
-                removeButton.dataset.removeNeighborhood = '';
-                removeButton.setAttribute('aria-label', 'Remover ' + name);
+            nameField.name = 'neighborhoods[' + nextIndex + '][name]';
+            feeField.name = 'neighborhoods[' + nextIndex + '][delivery_fee]';
+            widget.dataset.nextIndex = String(nextIndex + 1);
 
-                const nameField = document.createElement('input');
-                nameField.type = 'hidden';
-                nameField.name = 'neighborhoods[' + nextIndex + '][name]';
-                nameField.value = name;
-
-                const feeField = document.createElement('input');
-                feeField.type = 'hidden';
-                feeField.name = 'neighborhoods[' + nextIndex + '][delivery_fee]';
-                feeField.value = parsedFee.toFixed(2);
-
-                item.append(label, removeButton, nameField, feeField);
-                list.appendChild(item);
-                nextIndex++;
-                nameInput.value = '';
-                feeInput.value = '';
-                nameInput.focus();
-            });
-
-            list.addEventListener('click', function (event) {
-                if (event.target.closest('[data-remove-neighborhood]')) {
-                    event.target.closest('[data-neighborhood-item]').remove();
-                }
-            });
-        };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeNeighborhoodWidget);
-        } else {
-            initializeNeighborhoodWidget();
-        }
+            item.append(label, removeBadgeButton, nameField, feeField);
+            list.appendChild(item);
+            nameInput.value = '';
+            feeInput.value = '';
+            nameInput.focus();
+        });
     })();
 </script>
