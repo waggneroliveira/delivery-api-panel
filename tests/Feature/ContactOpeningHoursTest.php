@@ -48,17 +48,35 @@ class ContactOpeningHoursTest extends TestCase
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id');
+            $table->string('name_section')->nullable();
+            $table->string('name_section_social_media')->nullable();
+            $table->string('mention')->nullable();
+            $table->string('text')->nullable();
+            $table->string('name_two')->nullable();
+            $table->string('name_three')->nullable();
             $table->string('name_one')->nullable();
+            $table->string('address_one')->nullable();
+            $table->string('address_two')->nullable();
+            $table->string('address_three')->nullable();
+            $table->string('opening_hours_one')->nullable();
+            $table->string('opening_hours_two')->nullable();
+            $table->string('opening_hours_three')->nullable();
+            $table->string('phone_one')->nullable();
+            $table->string('phone_two')->nullable();
+            $table->string('phone_three')->nullable();
+            $table->string('whatsapp')->nullable();
             $table->text('maps')->nullable();
-            $table->unsignedTinyInteger('day_of_week');
-            $table->time('open_time')->nullable();
-            $table->time('close_time')->nullable();
-            $table->boolean('is_closed')->default(false);
+            $table->string('link_insta')->nullable();
+            $table->string('link_x')->nullable();
+            $table->string('link_youtube')->nullable();
+            $table->string('link_face')->nullable();
+            $table->string('link_tik_tok')->nullable();
+            $table->json('opening_hours')->nullable();
             $table->timestamps();
         });
     }
 
-    public function test_it_saves_and_updates_one_contact_record_per_weekday(): void
+    public function test_it_saves_and_updates_all_weekday_hours_in_one_contact_record(): void
     {
         $tenant = Tenant::create([
             'name' => 'Delivery',
@@ -75,26 +93,17 @@ class ContactOpeningHoursTest extends TestCase
 
         app(ContactController::class)->store($storeRequest);
 
-        $this->assertSame(7, Contact::count());
-        $this->assertDatabaseHas('contacts', [
-            'tenant_id' => $tenant->id,
-            'day_of_week' => 1,
-            'open_time' => '09:00',
-            'close_time' => '17:00',
-            'is_closed' => false,
-        ]);
-        $this->assertDatabaseHas('contacts', [
-            'tenant_id' => $tenant->id,
-            'day_of_week' => 7,
-            'open_time' => null,
-            'close_time' => null,
-            'is_closed' => true,
-        ]);
+        $this->assertSame(1, Contact::count());
+        $contact = Contact::firstOrFail();
+        $this->assertCount(7, $contact->opening_hours);
+        $this->assertSame(1, $contact->opening_hours[0]['day_of_week']);
+        $this->assertSame('09:00', $contact->opening_hours[0]['open_time']);
+        $this->assertTrue($contact->opening_hours[6]['is_closed']);
+        $this->assertNull($contact->opening_hours[6]['open_time']);
 
         $updatedOpeningHours = $this->openingHours();
         $updatedOpeningHours[2]['open_time'] = '10:30';
         $updatedOpeningHours[2]['close_time'] = '18:30';
-        $contact = Contact::query()->orderBy('day_of_week')->firstOrFail();
 
         $updateRequest = Request::create('/contacts/' . $contact->id, 'PUT', [
             'name_one' => 'novo-contato@example.com',
@@ -103,15 +112,11 @@ class ContactOpeningHoursTest extends TestCase
 
         app(ContactController::class)->update($updateRequest, $contact);
 
-        $this->assertSame(7, Contact::count());
-        $this->assertDatabaseHas('contacts', [
-            'tenant_id' => $tenant->id,
-            'name_one' => 'novo-contato@example.com',
-            'day_of_week' => 2,
-            'open_time' => '10:30',
-            'close_time' => '18:30',
-            'is_closed' => false,
-        ]);
+        $this->assertSame(1, Contact::count());
+        $contact->refresh();
+        $this->assertSame('novo-contato@example.com', $contact->name_one);
+        $this->assertSame('10:30', $contact->opening_hours[1]['open_time']);
+        $this->assertSame('18:30', $contact->opening_hours[1]['close_time']);
     }
 
     public function test_contacts_api_returns_individual_hours_for_the_current_tenant(): void
@@ -135,6 +140,60 @@ class ContactOpeningHoursTest extends TestCase
                 'tenant_id' => $tenant->id,
                 'name_one' => 'contato@example.com',
                 'maps' => null,
+                'opening_hours' => json_encode([
+                    ['day_of_week' => 1, 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+                    ['day_of_week' => 2, 'open_time' => '10:00', 'close_time' => '18:00', 'is_closed' => false],
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $otherTenant->id,
+                'name_one' => 'outro@example.com',
+                'maps' => null,
+                'opening_hours' => json_encode([
+                    ['day_of_week' => 1, 'open_time' => '08:00', 'close_time' => '16:00', 'is_closed' => false],
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->getJson('/api/contacts')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.opening_hours.0.day_of_week', 1)
+            ->assertJsonPath('data.0.opening_hours.0.open_time', '09:00')
+            ->assertJsonPath('data.0.opening_hours.1.day_of_week', 2)
+            ->assertJsonPath('data.0.opening_hours.1.close_time', '18:00');
+    }
+
+    public function test_json_migration_consolidates_contact_rows_and_can_restore_them(): void
+    {
+        $tenant = Tenant::create([
+            'name' => 'Migration tenant',
+            'slug' => 'migration-tenant',
+            'domain' => 'migration.localhost',
+            'active' => true,
+        ]);
+
+        Schema::drop('contacts');
+        Schema::create('contacts', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('tenant_id');
+            $table->string('name_one')->nullable();
+            $table->text('maps')->nullable();
+            $table->unsignedTinyInteger('day_of_week');
+            $table->time('open_time')->nullable();
+            $table->time('close_time')->nullable();
+            $table->boolean('is_closed')->default(false);
+            $table->timestamps();
+        });
+
+        DB::table('contacts')->insert([
+            [
+                'tenant_id' => $tenant->id,
+                'name_one' => 'contato@example.com',
                 'day_of_week' => 1,
                 'open_time' => '09:00',
                 'close_time' => '17:00',
@@ -145,7 +204,6 @@ class ContactOpeningHoursTest extends TestCase
             [
                 'tenant_id' => $tenant->id,
                 'name_one' => 'contato@example.com',
-                'maps' => null,
                 'day_of_week' => 2,
                 'open_time' => '10:00',
                 'close_time' => '18:00',
@@ -153,26 +211,27 @@ class ContactOpeningHoursTest extends TestCase
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'tenant_id' => $otherTenant->id,
-                'name_one' => 'outro@example.com',
-                'maps' => null,
-                'day_of_week' => 1,
-                'open_time' => '08:00',
-                'close_time' => '16:00',
-                'is_closed' => false,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
         ]);
 
-        $this->getJson('/api/contacts')
-            ->assertOk()
-            ->assertJsonCount(2, 'data')
-            ->assertJsonPath('data.0.day_of_week', 1)
-            ->assertJsonPath('data.0.open_time', '09:00')
-            ->assertJsonPath('data.1.day_of_week', 2)
-            ->assertJsonPath('data.1.close_time', '18:00');
+        $migration = require base_path('database/migrations/2026_11_14_124900_store_contact_opening_hours_as_json.php');
+        $migration->up();
+
+        $this->assertSame(1, DB::table('contacts')->count());
+        $this->assertFalse(Schema::hasColumn('contacts', 'day_of_week'));
+        $openingHours = json_decode(DB::table('contacts')->value('opening_hours'), true);
+        $this->assertSame('09:00', $openingHours[0]['open_time']);
+        $this->assertSame('10:00', $openingHours[1]['open_time']);
+        $this->assertTrue($openingHours[2]['is_closed']);
+
+        $migration->down();
+
+        $this->assertSame(7, DB::table('contacts')->count());
+        $this->assertDatabaseHas('contacts', [
+            'tenant_id' => $tenant->id,
+            'day_of_week' => 2,
+            'open_time' => '10:00',
+            'close_time' => '18:00',
+        ]);
     }
 
     private function openingHours(): array

@@ -26,14 +26,8 @@ class ContactController extends Controller
         if ($check !== true) {
             return $check; // retorna view 403
         }
-        $contact = Contact::query()
-            ->orderBy('day_of_week')
-            ->orderBy('id')
-            ->first();
-        $openingHours = Contact::query()
-            ->orderBy('day_of_week')
-            ->orderBy('id')
-            ->get(['day_of_week', 'open_time', 'close_time', 'is_closed']);
+        $contact = Contact::first();
+        $openingHours = $contact?->opening_hours ?? [];
         $theme = $themeManager;
         $themeData = $themeManager->theme();
         return view('admin.blades.contact.index', compact('contact', 'openingHours', 'theme', 'themeData'));
@@ -42,14 +36,12 @@ class ContactController extends Controller
     public function store(Request $request)
     {
         $data = $this->contactData($request);
-        $openingHours = $this->validatedOpeningHours($request)
+        $data['opening_hours'] = $this->validatedOpeningHours($request)
             ?? $this->closedOpeningHours();
 
         try {
             DB::beginTransaction();
-                foreach ($openingHours as $openingHour) {
-                    Contact::create(array_merge($data, $openingHour));
-                }
+                Contact::create($data);
             DB::commit();
             session()->flash('success', __('dashboard.response_item_create'));
             return redirect()->back();
@@ -65,17 +57,13 @@ class ContactController extends Controller
     {
         $data = $this->contactData($request);
         $openingHours = $this->validatedOpeningHours($request);
+        if ($openingHours !== null) {
+            $data['opening_hours'] = $openingHours;
+        }
         
         try {
             DB::beginTransaction();
-                if ($openingHours === null) {
-                    Contact::query()
-                        ->where('tenant_id', $contact->tenant_id)
-                        ->get()
-                        ->each(fn (Contact $record) => $record->fill($data)->save());
-                } else {
-                    $this->syncOpeningHours($contact, $data, $openingHours);
-                }
+                $contact->fill($data)->save();
             DB::commit();
             session()->flash('success', __('dashboard.response_item_create'));
             return redirect()->back();
@@ -172,47 +160,9 @@ class ContactController extends Controller
             ->all();
     }
 
-    private function syncOpeningHours(Contact $contact, array $data, array $openingHours): void
-    {
-        $existingByDay = Contact::query()
-            ->where('tenant_id', $contact->tenant_id)
-            ->orderBy('id')
-            ->get()
-            ->toBase()
-            ->groupBy('day_of_week');
-
-        $days = [];
-
-        foreach ($openingHours as $openingHour) {
-            $dayOfWeek = $openingHour['day_of_week'];
-            $dayRecords = $existingByDay->get($dayOfWeek, collect());
-            $record = $dayRecords->shift();
-
-            if ($record) {
-                $record->fill(array_merge($data, $openingHour))->save();
-            } else {
-                Contact::create(array_merge($data, $openingHour));
-            }
-
-            $dayRecords->each->delete();
-            $days[] = $dayOfWeek;
-        }
-
-        $existingByDay
-            ->except($days)
-            ->flatten()
-            ->each
-            ->delete();
-    }
-
-
     public function destroy(Contact $contact)
     {
-        Contact::query()
-            ->where('tenant_id', $contact->tenant_id)
-            ->get()
-            ->each
-            ->delete();
+        $contact->delete();
         session()->flash('success', __('dashboard.response_item_delete'));
         return redirect()->back();
     }

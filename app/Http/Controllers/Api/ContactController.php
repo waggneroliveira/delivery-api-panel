@@ -11,25 +11,21 @@ class ContactController extends Controller
     public function index(): JsonResponse
     {
         $contacts = Contact::query()
-            ->orderBy('day_of_week')
-            ->orderBy('id')
-            ->get([
-                'id',
-                'text',
-                'whatsapp',
-                'name_one',
-                'address_one',
-                'phone_one',
-                'link_insta',
-                'link_x',
-                'link_youtube',
-                'link_face',
-                'link_tik_tok',
-                'day_of_week',
-                'open_time',
-                'close_time',
-                'is_closed',
-            ]);
+        ->orderBy('id')
+        ->get([
+            'id',
+            'text',
+            'whatsapp',
+            'name_one',
+            'address_one',
+            'phone_one',
+            'link_insta',
+            'link_x',
+            'link_youtube',
+            'link_face',
+            'link_tik_tok',
+            'opening_hours',
+        ]);
 
         return response()->json([
             'data' => $contacts,

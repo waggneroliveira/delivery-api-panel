@@ -88,13 +88,13 @@
                             $openingHour = $openingHoursByDay->get($dayOfWeek);
                             $isClosed = old(
                                 "opening_hours.{$dayOfWeek}.is_closed",
-                                (bool) ($openingHour->is_closed ?? false)
+                                (bool) ($openingHour['is_closed'] ?? false)
                             );
-                            $openTime = $openingHour?->open_time
-                                ? substr((string) $openingHour->open_time, 0, 5)
+                            $openTime = isset($openingHour['open_time'])
+                                ? substr((string) $openingHour['open_time'], 0, 5)
                                 : '';
-                            $closeTime = $openingHour?->close_time
-                                ? substr((string) $openingHour->close_time, 0, 5)
+                            $closeTime = isset($openingHour['close_time'])
+                                ? substr((string) $openingHour['close_time'], 0, 5)
                                 : '';
                         @endphp
                         <div class="col-12">
