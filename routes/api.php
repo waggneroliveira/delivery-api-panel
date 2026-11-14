@@ -48,7 +48,7 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->name('api.slides.index');
 
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
-    ->get('/categoria', [ProductCategoryController::class, 'index'])
+    ->get('/category', [ProductCategoryController::class, 'index'])
     ->name('api.product-category.index');
 
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
