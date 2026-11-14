@@ -387,6 +387,69 @@ class ClientApiTest extends TestCase
             ]);
     }
 
+    public function test_service_locations_api_returns_active_locations_with_neighborhood_delivery_fees(): void
+    {
+        Schema::create('service_locations', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('tenant_id');
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->string('path_image')->nullable();
+            $table->boolean('active')->default(false);
+            $table->json('neighborhoods')->nullable();
+            $table->timestamps();
+        });
+
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        DB::table('service_locations')->insert([
+            [
+                'tenant_id' => $tenant->id,
+                'title' => 'Campinas',
+                'description' => 'Área atendida',
+                'path_image' => 'locations/campinas.avif',
+                'active' => true,
+                'neighborhoods' => json_encode([
+                    ['name' => 'Centro', 'delivery_fee' => 5.5],
+                    ['name' => 'Taquaral', 'delivery_fee' => 8.25],
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $tenant->id,
+                'title' => 'Inativa',
+                'description' => null,
+                'path_image' => null,
+                'active' => false,
+                'neighborhoods' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->getJson('/api/service-locations')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [[
+                    'id' => 1,
+                    'title' => 'Campinas',
+                    'description' => 'Área atendida',
+                    'path_image' => 'locations/campinas.avif',
+                    'neighborhoods' => [
+                        ['name' => 'Centro', 'delivery_fee' => 5.5],
+                        ['name' => 'Taquaral', 'delivery_fee' => 8.25],
+                    ],
+                ]],
+            ]);
+    }
+
     public function test_announcements_api_returns_public_announcements_by_ad_slot(): void
     {
         $theme = TemplateTheme::create([
