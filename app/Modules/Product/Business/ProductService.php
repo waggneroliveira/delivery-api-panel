@@ -126,6 +126,7 @@ class ProductService
         array &$oldFiles = []
     ): array {
         $data['active'] = $request->boolean('active');
+        $data['featured'] = $request->boolean('featured');
 
         if (!empty($request->title)) {
             $data['slug'] = Str::slug($request->title);

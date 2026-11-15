@@ -24,6 +24,7 @@ class ProductStoreRequest extends FormRequest
     {
         $this->merge([
             'active' => $this->boolean('active'),
+            'featured' => $this->boolean('featured'),
         ] + $this->normalizeProductPrices());
     }
 
@@ -35,6 +36,7 @@ class ProductStoreRequest extends FormRequest
             'path_image' => ['nullable', 'file', 'image', 'max:2048', 'mimes:jpg,jpeg,png,gif'],
             'path_file' => ['nullable', 'file', 'max:3072'],
             'active' => 'boolean',
+            'featured' => 'boolean',
             'sorting' => ['nullable', 'integer'],
         ], $this->productCompositionRules());
     }
