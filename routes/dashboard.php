@@ -315,6 +315,16 @@ Route::prefix('painel/')->group(function () {
         Route::post('pergunta/sorting', [FaqController::class, 'sorting'])
         ->name('admin.dashboard.faq.sorting');
         //PRODUTOS
+        Route::get(
+            'produtos/estrutura',
+            [ProductController::class, 'structure']
+        )->name('admin.dashboard.product.structure');
+
+        Route::get(
+            'produtos/json',
+            [ProductController::class, 'jsonIndex']
+        )->name('admin.dashboard.product.json');
+
         Route::resource('produtos', ProductController::class)
             ->parameters(['produtos' => 'product'])
             ->names('admin.dashboard.product');
