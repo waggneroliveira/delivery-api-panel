@@ -29,6 +29,18 @@ class NormalizesProductPricesTest extends TestCase
                     ],
                 ],
             ],
+            'combo_items' => [
+                [
+                    'name' => 'Refrigerante',
+                    'options' => [
+                        [
+                            'choices' => [
+                                ['name' => 'Cola', 'price' => '2,50'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             'combo_addons' => [
                 ['name' => 'Extra', 'price' => '12,00'],
             ],
@@ -41,6 +53,18 @@ class NormalizesProductPricesTest extends TestCase
                 [
                     'choices' => [
                         ['name' => 'Grande', 'price' => '5.50'],
+                    ],
+                ],
+            ],
+            'combo_items' => [
+                [
+                    'name' => 'Refrigerante',
+                    'options' => [
+                        [
+                            'choices' => [
+                                ['name' => 'Cola', 'price' => '2.50'],
+                            ],
+                        ],
                     ],
                 ],
             ],

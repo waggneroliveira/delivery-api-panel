@@ -19,23 +19,22 @@ trait NormalizesProductPrices
         $options = $this->input('options');
 
         if (is_array($options)) {
-            foreach ($options as &$option) {
-                if (!is_array($option) || !is_array($option['choices'] ?? null)) {
-                    continue;
-                }
+            $normalized['options'] = $this->normalizeOptionPrices($options);
+        }
 
-                foreach ($option['choices'] as &$choice) {
-                    if (is_array($choice) && array_key_exists('price', $choice)) {
-                        $choice['price'] = $this->normalizeMoneyInput(
-                            $choice['price']
-                        );
-                    }
+        $comboItems = $this->input('combo_items');
+
+        if (is_array($comboItems)) {
+            foreach ($comboItems as &$comboItem) {
+                if (is_array($comboItem) && is_array($comboItem['options'] ?? null)) {
+                    $comboItem['options'] = $this->normalizeOptionPrices(
+                        $comboItem['options']
+                    );
                 }
-                unset($choice);
             }
-            unset($option);
+            unset($comboItem);
 
-            $normalized['options'] = $options;
+            $normalized['combo_items'] = $comboItems;
         }
 
         $addons = $this->input('combo_addons');
@@ -54,6 +53,27 @@ trait NormalizesProductPrices
         }
 
         return $normalized;
+    }
+
+    private function normalizeOptionPrices(array $options): array
+    {
+        foreach ($options as &$option) {
+            if (!is_array($option) || !is_array($option['choices'] ?? null)) {
+                continue;
+            }
+
+            foreach ($option['choices'] as &$choice) {
+                if (is_array($choice) && array_key_exists('price', $choice)) {
+                    $choice['price'] = $this->normalizeMoneyInput(
+                        $choice['price']
+                    );
+                }
+            }
+            unset($choice);
+        }
+        unset($option);
+
+        return $options;
     }
 
     private function normalizeMoneyInput(mixed $value): mixed
@@ -100,6 +120,20 @@ trait NormalizesProductPrices
             'combo_items.*.name' => ['required', 'string', 'max:255'],
             'combo_items.*.quantity' => ['nullable', 'integer', 'min:1'],
             'combo_items.*.required' => ['nullable', 'boolean'],
+            'combo_items.*.options' => ['sometimes', 'array'],
+            'combo_items.*.options.*.title' => ['required', 'string', 'max:255'],
+            'combo_items.*.options.*.type' => ['required', 'in:single,multiple'],
+            'combo_items.*.options.*.max_selections' => ['nullable', 'integer', 'min:1'],
+            'combo_items.*.options.*.required' => ['nullable', 'boolean'],
+            'combo_items.*.options.*.choices' => ['sometimes', 'array'],
+            'combo_items.*.options.*.choices.*.id' => ['nullable', 'string', 'max:100'],
+            'combo_items.*.options.*.choices.*.name' => ['required', 'string', 'max:255'],
+            'combo_items.*.options.*.choices.*.price' => ['nullable', 'numeric', 'min:0'],
+            'combo_items.*.options.*.choices.*.description' => ['nullable', 'string', 'max:1000'],
+            'combo_items.*.options.*.choices.*.maxQuantity' => ['nullable', 'integer', 'min:1'],
+            'combo_items.*.options.*.choices.*.category' => ['nullable', 'string', 'max:255'],
+            'combo_items.*.options.*.choices.*.default' => ['nullable', 'boolean'],
+            'combo_items.*.options.*.choices.*.isRecommended' => ['nullable', 'boolean'],
             'combo_addons' => ['sometimes', 'array'],
             'combo_addons.*.name' => ['required', 'string', 'max:255'],
             'combo_addons.*.price' => ['nullable', 'numeric', 'min:0'],

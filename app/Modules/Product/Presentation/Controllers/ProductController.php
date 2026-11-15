@@ -168,6 +168,26 @@ class ProductController
                         'name' => 'Refrigerante',
                         'quantity' => 1,
                         'required' => 1,
+                        'options' => [
+                            [
+                                'title' => 'Sabor',
+                                'type' => 'single',
+                                'max_selections' => 1,
+                                'required' => 1,
+                                'choices' => [
+                                    [
+                                        'id' => 'sabor-cola',
+                                        'name' => 'Cola',
+                                        'price' => '0.00',
+                                    ],
+                                    [
+                                        'id' => 'sabor-guarana',
+                                        'name' => 'Guaraná',
+                                        'price' => '0.00',
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
                 'combo_addons' => [
@@ -181,6 +201,7 @@ class ProductController
             'notes' => [
                 'As escolhas são preenchidas como campos do formulário, não como JSON digitado manualmente.',
                 'Cada escolha pode ter id, name, price, description, maxQuantity, category, default e isRecommended.',
+                'As opções de cada item de combo ficam em combo_items[n].options[m], e suas escolhas em combo_items[n].options[m].choices.',
                 'Os preços são salvos em formato decimal e normalizados no servidor.',
                 'Imagens e arquivos são enviados como arquivos multipart.',
             ],

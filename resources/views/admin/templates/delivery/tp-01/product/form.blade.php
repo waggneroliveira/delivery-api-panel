@@ -427,7 +427,7 @@
                                                 <button
                                                     type="button"
                                                     class="btn btn-sm btn-outline-primary add-choice"
-                                                    data-option-index="{{ $index }}"
+                                                    data-option-name="options[{{ $index }}]"
                                                 >
                                                     <i class="mdi mdi-plus"></i>
                                                     Adicionar escolha
@@ -597,7 +597,17 @@
                     <div id="comboItemsContainer">
 
                         @foreach ($comboItems as $index => $item)
-                            <div class="card border mb-3 combo-item-card">
+                            @php
+                                $itemOptions = $item['options'] ?? [];
+                                $nextItemOptionIndex = empty($itemOptions)
+                                    ? 0
+                                    : max(array_map('intval', array_keys($itemOptions))) + 1;
+                            @endphp
+                            <div
+                                class="card border mb-3 combo-item-card"
+                                data-combo-index="{{ $index }}"
+                                data-next-option-index="{{ $nextItemOptionIndex }}"
+                            >
                                 <div class="card-body">
 
                                     <div class="row">
@@ -639,6 +649,193 @@
                                                     Obrigatório
                                                 </label>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="combo-item-options border-top pt-3 mt-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div>
+                                                <h6 class="mb-1">Opções deste item</h6>
+                                                <small class="text-muted">
+                                                    Ex.: sabores de refrigerante ou ponto da carne.
+                                                </small>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-primary add-combo-item-option"
+                                            >
+                                                <i class="mdi mdi-plus"></i>
+                                                Adicionar opção
+                                            </button>
+                                        </div>
+
+                                        <div class="combo-item-options-container">
+                                            @foreach ($itemOptions as $optionIndex => $option)
+                                                <div class="card border mb-3 combo-item-option-card">
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-5 mb-3">
+                                                                <label class="form-label">Título da opção</label>
+                                                                <input
+                                                                    type="text"
+                                                                    name="combo_items[{{ $index }}][options][{{ $optionIndex }}][title]"
+                                                                    class="form-control"
+                                                                    value="{{ $option['title'] ?? '' }}"
+                                                                    required
+                                                                >
+                                                            </div>
+
+                                                            <div class="col-md-4 mb-3">
+                                                                <label class="form-label">Tipo</label>
+                                                                <select
+                                                                    name="combo_items[{{ $index }}][options][{{ $optionIndex }}][type]"
+                                                                    class="form-select"
+                                                                >
+                                                                    <option value="single" {{ ($option['type'] ?? '') === 'single' ? 'selected' : '' }}>Escolha única</option>
+                                                                    <option value="multiple" {{ ($option['type'] ?? '') === 'multiple' ? 'selected' : '' }}>Múltipla escolha</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-3 mb-3">
+                                                                <label class="form-label">Máximo de escolhas</label>
+                                                                <input
+                                                                    type="number"
+                                                                    name="combo_items[{{ $index }}][options][{{ $optionIndex }}][max_selections]"
+                                                                    class="form-control"
+                                                                    min="1"
+                                                                    value="{{ $option['max_selections'] ?? 1 }}"
+                                                                >
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <label class="form-label mb-0">Escolhas disponíveis</label>
+                                                                    <button
+                                                                        type="button"
+                                                                        class="btn btn-sm btn-outline-primary add-choice"
+                                                                        data-option-name="combo_items[{{ $index }}][options][{{ $optionIndex }}]"
+                                                                    >
+                                                                        <i class="mdi mdi-plus"></i>
+                                                                        Adicionar escolha
+                                                                    </button>
+                                                                </div>
+
+                                                                <div class="choices-container">
+                                                                    @foreach ($choicesFrom($option) as $choiceIndex => $choice)
+                                                                        <div class="border rounded p-3 mb-2 choice-row" data-choice-index="{{ $choiceIndex }}">
+                                                                            @if (!empty($choice['id']))
+                                                                                <input
+                                                                                    type="hidden"
+                                                                                    name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][id]"
+                                                                                    value="{{ $choice['id'] }}"
+                                                                                >
+                                                                            @endif
+                                                                            <div class="row align-items-end">
+                                                                                <div class="col-md-5 mb-2">
+                                                                                    <label class="form-label">Nome da escolha</label>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][name]"
+                                                                                        class="form-control"
+                                                                                        value="{{ $choice['name'] ?? '' }}"
+                                                                                        placeholder="Ex.: Cola"
+                                                                                        required
+                                                                                    >
+                                                                                </div>
+                                                                                <div class="col-md-3 mb-2">
+                                                                                    <label class="form-label">Preço adicional</label>
+                                                                                    <div class="input-group">
+                                                                                        <span class="input-group-text">R$</span>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][price]"
+                                                                                            class="form-control money-mask"
+                                                                                            value="{{ $choice['price'] ?? '' }}"
+                                                                                            placeholder="0,00"
+                                                                                            inputmode="decimal"
+                                                                                        >
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-4 mb-2">
+                                                                                    <label class="form-label">Categoria (opcional)</label>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][category]"
+                                                                                        class="form-control"
+                                                                                        value="{{ $choice['category'] ?? '' }}"
+                                                                                    >
+                                                                                </div>
+                                                                                <div class="col-md-8 mb-2">
+                                                                                    <label class="form-label">Descrição (opcional)</label>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][description]"
+                                                                                        class="form-control"
+                                                                                        value="{{ $choice['description'] ?? '' }}"
+                                                                                    >
+                                                                                </div>
+                                                                                <div class="col-md-4 mb-2">
+                                                                                    <label class="form-label">Quantidade máxima</label>
+                                                                                    <input
+                                                                                        type="number"
+                                                                                        name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][maxQuantity]"
+                                                                                        class="form-control"
+                                                                                        min="1"
+                                                                                        value="{{ $choice['maxQuantity'] ?? 1 }}"
+                                                                                    >
+                                                                                </div>
+                                                                                <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
+                                                                                    <div class="form-check">
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][default]"
+                                                                                            value="1"
+                                                                                            class="form-check-input"
+                                                                                            {{ !empty($choice['default']) ? 'checked' : '' }}
+                                                                                        >
+                                                                                        <label class="form-check-label">Pré-selecionada</label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            name="combo_items[{{ $index }}][options][{{ $optionIndex }}][choices][{{ $choiceIndex }}][isRecommended]"
+                                                                                            value="1"
+                                                                                            class="form-check-input"
+                                                                                            {{ !empty($choice['isRecommended']) ? 'checked' : '' }}
+                                                                                        >
+                                                                                        <label class="form-check-label">Recomendada</label>
+                                                                                    </div>
+                                                                                    <button type="button" class="btn btn-sm btn-outline-danger remove-choice ms-auto">
+                                                                                        Remover escolha
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-12 mt-2">
+                                                                <div class="form-check">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        name="combo_items[{{ $index }}][options][{{ $optionIndex }}][required]"
+                                                                        value="1"
+                                                                        class="form-check-input"
+                                                                        {{ !empty($option['required']) ? 'checked' : '' }}
+                                                                    >
+                                                                    <label class="form-check-label">Esta opção é obrigatória</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <button type="button" class="btn btn-sm btn-outline-danger remove-card mt-3">
+                                                            Remover opção
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
 
@@ -978,53 +1175,54 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Geradores de índices
     let optionIndex = {{ empty($options) ? 0 : max(array_map('intval', array_keys($options))) + 1 }};
-    let comboItemIndex = {{ count($comboItems) }};
+    let comboItemIndex = {{ empty($comboItems) ? 0 : max(array_map('intval', array_keys($comboItems))) + 1 }};
     let addonIndex = {{ count($comboAddons) }};
 
-    function createChoiceRow(option, choice) {
+    function createChoiceRow(optionName, choice) {
+        const optionKey = optionName.replace(/[^a-zA-Z0-9_-]/g, '-');
         const choiceId = window.crypto?.randomUUID
             ? window.crypto.randomUUID()
-            : `choice-${Date.now()}-${option}-${choice}`;
+            : `choice-${Date.now()}-${optionKey}-${choice}`;
 
         return `
             <div class="border rounded p-3 mb-2 choice-row" data-choice-index="${choice}">
-                <input type="hidden" name="options[${option}][choices][${choice}][id]" value="${choiceId}">
+                <input type="hidden" name="${optionName}[choices][${choice}][id]" value="${choiceId}">
                 <div class="row align-items-end">
                     <div class="col-md-5 mb-2">
                         <label class="form-label">Nome da escolha</label>
-                        <input type="text" name="options[${option}][choices][${choice}][name]" class="form-control" placeholder="Ex.: Grande" required>
+                        <input type="text" name="${optionName}[choices][${choice}][name]" class="form-control" placeholder="Ex.: Grande" required>
                     </div>
 
                     <div class="col-md-3 mb-2">
                         <label class="form-label">Preço adicional</label>
                         <div class="input-group">
                             <span class="input-group-text">R$</span>
-                            <input type="text" name="options[${option}][choices][${choice}][price]" class="form-control money-mask" placeholder="0,00" inputmode="decimal">
+                            <input type="text" name="${optionName}[choices][${choice}][price]" class="form-control money-mask" placeholder="0,00" inputmode="decimal">
                         </div>
                     </div>
 
                     <div class="col-md-4 mb-2">
                         <label class="form-label">Categoria (opcional)</label>
-                        <input type="text" name="options[${option}][choices][${choice}][category]" class="form-control" placeholder="Ex.: acompanhamentos">
+                        <input type="text" name="${optionName}[choices][${choice}][category]" class="form-control" placeholder="Ex.: acompanhamentos">
                     </div>
 
                     <div class="col-md-8 mb-2">
                         <label class="form-label">Descrição (opcional)</label>
-                        <input type="text" name="options[${option}][choices][${choice}][description]" class="form-control" placeholder="Detalhes desta escolha">
+                        <input type="text" name="${optionName}[choices][${choice}][description]" class="form-control" placeholder="Detalhes desta escolha">
                     </div>
 
                     <div class="col-md-4 mb-2">
                         <label class="form-label">Quantidade máxima</label>
-                        <input type="number" name="options[${option}][choices][${choice}][maxQuantity]" class="form-control" min="1" value="1">
+                        <input type="number" name="${optionName}[choices][${choice}][maxQuantity]" class="form-control" min="1" value="1">
                     </div>
 
                     <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
                         <div class="form-check">
-                            <input type="checkbox" name="options[${option}][choices][${choice}][default]" value="1" class="form-check-input">
+                            <input type="checkbox" name="${optionName}[choices][${choice}][default]" value="1" class="form-check-input">
                             <label class="form-check-label">Pré-selecionada</label>
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" name="options[${option}][choices][${choice}][isRecommended]" value="1" class="form-check-input">
+                            <input type="checkbox" name="${optionName}[choices][${choice}][isRecommended]" value="1" class="form-check-input">
                             <label class="form-check-label">Recomendada</label>
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-danger remove-choice ms-auto">
@@ -1041,14 +1239,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (addChoiceButton) {
             const optionCard = addChoiceButton.closest('.option-card');
-            const choicesContainer = optionCard.querySelector('.choices-container');
+            const choicesContainer = optionCard
+                ? optionCard.querySelector('.choices-container')
+                : addChoiceButton.closest('.combo-item-option-card').querySelector('.choices-container');
             const indexes = Array.from(choicesContainer.querySelectorAll('.choice-row'))
                 .map(row => Number(row.dataset.choiceIndex));
             const choiceIndex = indexes.length ? Math.max(...indexes) + 1 : 0;
 
             choicesContainer.insertAdjacentHTML(
                 'beforeend',
-                createChoiceRow(addChoiceButton.dataset.optionIndex, choiceIndex)
+                createChoiceRow(addChoiceButton.dataset.optionName, choiceIndex)
             );
             return;
         }
@@ -1090,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="col-12">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label mb-0">Escolhas disponíveis</label>
-                                <button type="button" class="btn btn-sm btn-outline-primary add-choice" data-option-index="${index}">
+                                <button type="button" class="btn btn-sm btn-outline-primary add-choice" data-option-name="options[${index}]">
                                     <i class="mdi mdi-plus"></i>
                                     Adicionar escolha
                                 </button>
@@ -1119,13 +1319,75 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('optionsContainer').insertAdjacentHTML('beforeend', html);
     });
 
+    // Adicionar opção a um item do combo
+    document.addEventListener('click', event => {
+        const addButton = event.target.closest('.add-combo-item-option');
+
+        if (!addButton) {
+            return;
+        }
+
+        const comboItemCard = addButton.closest('.combo-item-card');
+        const comboIndex = comboItemCard.dataset.comboIndex;
+        const optionIndex = Number(comboItemCard.dataset.nextOptionIndex);
+        comboItemCard.dataset.nextOptionIndex = String(optionIndex + 1);
+        const optionName = `combo_items[${comboIndex}][options][${optionIndex}]`;
+
+        const html = `
+            <div class="card border mb-3 combo-item-option-card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">Título da opção</label>
+                            <input type="text" name="${optionName}[title]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tipo</label>
+                            <select name="${optionName}[type]" class="form-select">
+                                <option value="single">Escolha única</option>
+                                <option value="multiple">Múltipla escolha</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Máximo de escolhas</label>
+                            <input type="number" name="${optionName}[max_selections]" class="form-control" min="1" value="1">
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Escolhas disponíveis</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary add-choice" data-option-name="${optionName}">
+                                    <i class="mdi mdi-plus"></i>
+                                    Adicionar escolha
+                                </button>
+                            </div>
+                            <div class="choices-container"></div>
+                            <small class="text-muted">Adicione as escolhas disponíveis para este item.</small>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="${optionName}[required]" value="1" class="form-check-input">
+                                <label class="form-check-label">Esta opção é obrigatória</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-card mt-3">
+                        Remover opção
+                    </button>
+                </div>
+            </div>
+        `;
+
+        comboItemCard.querySelector('.combo-item-options-container')
+            .insertAdjacentHTML('beforeend', html);
+    });
+
     // Adicionar item do combo
     document.getElementById('addComboItem').addEventListener('click', function () {
 
         const index = comboItemIndex++;
 
         const html = `
-            <div class="card border mb-3 combo-item-card">
+            <div class="card border mb-3 combo-item-card" data-combo-index="${index}" data-next-option-index="0">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -1144,6 +1406,20 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <label class="form-check-label">Obrigatório</label>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="combo-item-options border-top pt-3 mt-2">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-1">Opções deste item</h6>
+                                <small class="text-muted">Ex.: sabores de refrigerante ou ponto da carne.</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary add-combo-item-option">
+                                <i class="mdi mdi-plus"></i>
+                                Adicionar opção
+                            </button>
+                        </div>
+                        <div class="combo-item-options-container"></div>
                     </div>
 
                     <button type="button" class="btn btn-sm btn-outline-danger remove-card">
