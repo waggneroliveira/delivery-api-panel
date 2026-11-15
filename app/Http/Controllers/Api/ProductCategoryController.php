@@ -12,7 +12,7 @@ class ProductCategoryController extends Controller
 
     public function index(): JsonResponse
     {
-        $productCategories = ProductCategory::active()
+        $productCategories = ProductCategory::whereHas('products')->active()
             ->sorting()
             ->get([
                 'title',

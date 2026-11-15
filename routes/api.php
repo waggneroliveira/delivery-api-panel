@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AppearanceController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CustomerAddress;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\ServiceLocationController;
 use App\Http\Controllers\Api\SlideController;
@@ -64,6 +65,10 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/category', [ProductCategoryController::class, 'index'])
     ->name('api.product-category.index');
+
+Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
+    ->get('/products', [ProductController::class, 'index'])
+    ->name('api.products.index');
 
 Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
     ->get('/service-locations', [ServiceLocationController::class, 'index'])
