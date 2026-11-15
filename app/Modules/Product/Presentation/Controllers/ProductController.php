@@ -32,7 +32,7 @@ class ProductController
             return $data['forbidden'];
         }
 
-        return view('admin.dashboard.product.index', $data);
+        return view('admin.blades.product.index', $data);
     }
 
     /**
@@ -47,7 +47,7 @@ class ProductController
             return $data['forbidden'];
         }
 
-        return view('admin.dashboard.product.create', $data);
+        return view('admin.blades.product.create', $data);
     }
 
     /**
@@ -79,7 +79,7 @@ class ProductController
             return $data['forbidden'];
         }
 
-        return view('admin.dashboard.product.edit', $data);
+        return view('admin.blades.product.edit', $data);
     }
 
     /**
