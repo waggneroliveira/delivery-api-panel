@@ -2,7 +2,7 @@
 @php
     $isEdit = isset($product);
 
-    $categories = $productCategory ?? collect();
+    $categories = $categories ?? collect();
     $brands = $brands ?? collect();
 
     $options = old(
