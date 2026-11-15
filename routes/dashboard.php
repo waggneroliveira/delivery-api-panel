@@ -315,71 +315,24 @@ Route::prefix('painel/')->group(function () {
         Route::post('pergunta/sorting', [FaqController::class, 'sorting'])
         ->name('admin.dashboard.faq.sorting');
         //PRODUTOS
-        // Route::resource('produtos', ProductController::class)
-        // ->parameters(['produtos' => 'product'])
-        // ->names('admin.dashboard.product');
-        // Route::post('produtos/delete', [ProductController::class, 'destroySelected'])
-        // ->name('admin.dashboard.product.destroySelected');
-        // Route::post('produtos/sorting', [ProductController::class, 'sorting'])
-        // ->name('admin.dashboard.product.sorting');
-        // Route::post('produtos/uploadImageCkeditor', [ProductController::class, 'uploadImageCkeditor'])
-        // ->name('admin.dashboard.product.uploadImageCkeditor');
+        Route::resource('produtos', ProductController::class)
+            ->parameters(['produtos' => 'product'])
+            ->names('admin.dashboard.product');
 
+        Route::post(
+            'produtos/delete',
+            [ProductController::class, 'destroySelected']
+        )->name('admin.dashboard.product.destroySelected');
 
+        Route::post(
+            'produtos/sorting',
+            [ProductController::class, 'sorting']
+        )->name('admin.dashboard.product.sorting');
 
-Route::resource('produtos', ProductController::class)
-    ->parameters(['produtos' => 'product'])
-    ->names('admin.dashboard.product');
-
-Route::post(
-    'produtos/delete',
-    [ProductController::class, 'destroySelected']
-)->name('admin.dashboard.product.destroySelected');
-
-Route::post(
-    'produtos/sorting',
-    [ProductController::class, 'sorting']
-)->name('admin.dashboard.product.sorting');
-
-Route::post(
-    'produtos/uploadImageCkeditor',
-    [ProductController::class, 'uploadImageCkeditor']
-)->name('admin.dashboard.product.uploadImageCkeditor');
-
-
-
-        // Route::prefix('dashboard')
-        // ->name('dashboard.')
-        // ->group(function () {
-
-        //     Route::prefix('product')
-        //         ->name('product.')
-        //         ->controller(ProductController::class)
-        //         ->group(function () {
-
-        //             // Rotas específicas antes das rotas com parâmetros
-        //             Route::get('/', 'index')->name('index');
-
-        //             Route::get('/create', 'create')->name('create');
-
-        //             Route::post('/', 'store')->name('store');
-
-        //             Route::post('/sorting', 'sorting')->name('sorting');
-
-        //             Route::post('/destroy-selected', 'destroySelected')
-        //                 ->name('destroySelected');
-
-        //             Route::post('/upload-image-ckeditor', 'uploadImageCkeditor')
-        //                 ->name('uploadImageCkeditor');
-
-        //             Route::get('/{product}/edit', 'edit')->name('edit');
-
-        //             Route::put('/{product}', 'update')->name('update');
-
-        //             Route::delete('/{product}', 'destroy')->name('destroy');
-        //         });
-        // });
-
+        Route::post(
+            'produtos/uploadImageCkeditor',
+            [ProductController::class, 'uploadImageCkeditor']
+        )->name('admin.dashboard.product.uploadImageCkeditor');
 
         
         //MARCAS

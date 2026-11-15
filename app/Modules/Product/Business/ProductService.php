@@ -135,6 +135,10 @@ class ProductService
             $data['price'] = $this->normalizePrice($data['price']);
         }
 
+        if (isset($data['old_price'])) {
+            $data['old_price'] = $this->normalizePrice($data['old_price']);
+        }
+
         // Mantém compatibilidade com o campo antigo sizes.
         // Quando a estrutura nova estiver totalmente implantada,
         // esse tratamento poderá ser removido.
@@ -363,6 +367,8 @@ class ProductService
                 $optionData['combo_item_id']
             );
 
+            $optionData = $this->normalizeOptionChoices($optionData);
+
             $product->options()->create($optionData);
         }
     }
@@ -396,9 +402,32 @@ class ProductService
                     $optionData['combo_item_id']
                 );
 
+                $optionData = $this->normalizeOptionChoices($optionData);
+
                 $comboItem->options()->create($optionData);
             }
         }
+    }
+
+    private function normalizeOptionChoices(array $optionData): array
+    {
+        if (!is_array($optionData['choices'] ?? null)) {
+            return $optionData;
+        }
+
+        $choices = [];
+
+        foreach ($optionData['choices'] as $choice) {
+            if (is_array($choice) && array_key_exists('price', $choice)) {
+                $choice['price'] = $this->normalizePrice($choice['price']);
+            }
+
+            $choices[] = $choice;
+        }
+
+        $optionData['choices'] = $choices;
+
+        return $optionData;
     }
 
     /**

@@ -27,9 +27,13 @@
 
     $choicesFrom = function ($option) {
         if (isset($option['choices'])) {
-            return is_string($option['choices'])
+            $choices = is_string($option['choices'])
                 ? json_decode($option['choices'], true) ?? []
                 : $option['choices'];
+
+            return is_array($choices)
+                ? array_values(array_filter($choices, 'is_array'))
+                : [];
         }
 
         return [];
@@ -399,6 +403,10 @@
                                                     Múltipla escolha
                                                 </option>
                                             </select>
+
+                                            <small class="text-muted">
+                                                Escolha única permite marcar uma opção; múltipla escolha permite marcar várias.
+                                            </small>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
@@ -414,17 +422,130 @@
                                         </div>
 
                                         <div class="col-12">
-                                            <label class="form-label">Escolhas disponíveis</label>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <label class="form-label mb-0">Escolhas disponíveis</label>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-sm btn-outline-primary add-choice"
+                                                    data-option-index="{{ $index }}"
+                                                >
+                                                    <i class="mdi mdi-plus"></i>
+                                                    Adicionar escolha
+                                                </button>
+                                            </div>
 
-                                            <textarea
-                                                name="options[{{ $index }}][choices]"
-                                                class="form-control choices-json"
-                                                rows="4"
-                                                placeholder='[{"id":"1","name":"Grande","price":5}]'
-                                            >{{ is_array($option['choices'] ?? null) ? json_encode($option['choices'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : ($option['choices'] ?? '[]') }}</textarea>
+                                            <div class="choices-container">
+                                                @foreach ($choicesFrom($option) as $choiceIndex => $choice)
+                                                    <div
+                                                        class="border rounded p-3 mb-2 choice-row"
+                                                        data-choice-index="{{ $choiceIndex }}"
+                                                    >
+                                                        @if (!empty($choice['id']))
+                                                            <input
+                                                                type="hidden"
+                                                                name="options[{{ $index }}][choices][{{ $choiceIndex }}][id]"
+                                                                value="{{ $choice['id'] }}"
+                                                            >
+                                                        @endif
+
+                                                        <div class="row align-items-end">
+                                                            <div class="col-md-5 mb-2">
+                                                                <label class="form-label">Nome da escolha</label>
+                                                                <input
+                                                                    type="text"
+                                                                    name="options[{{ $index }}][choices][{{ $choiceIndex }}][name]"
+                                                                    class="form-control"
+                                                                    value="{{ $choice['name'] ?? '' }}"
+                                                                    placeholder="Ex.: Grande"
+                                                                    required
+                                                                >
+                                                            </div>
+
+                                                            <div class="col-md-3 mb-2">
+                                                                <label class="form-label">Preço adicional</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text">R$</span>
+                                                                    <input
+                                                                        type="text"
+                                                                        name="options[{{ $index }}][choices][{{ $choiceIndex }}][price]"
+                                                                        class="form-control money-mask"
+                                                                        value="{{ $choice['price'] ?? '' }}"
+                                                                        placeholder="0,00"
+                                                                        inputmode="decimal"
+                                                                    >
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4 mb-2">
+                                                                <label class="form-label">Categoria (opcional)</label>
+                                                                <input
+                                                                    type="text"
+                                                                    name="options[{{ $index }}][choices][{{ $choiceIndex }}][category]"
+                                                                    class="form-control"
+                                                                    value="{{ $choice['category'] ?? '' }}"
+                                                                    placeholder="Ex.: acompanhamentos"
+                                                                >
+                                                            </div>
+
+                                                            <div class="col-md-8 mb-2">
+                                                                <label class="form-label">Descrição (opcional)</label>
+                                                                <input
+                                                                    type="text"
+                                                                    name="options[{{ $index }}][choices][{{ $choiceIndex }}][description]"
+                                                                    class="form-control"
+                                                                    value="{{ $choice['description'] ?? '' }}"
+                                                                    placeholder="Detalhes desta escolha"
+                                                                >
+                                                            </div>
+
+                                                            <div class="col-md-4 mb-2">
+                                                                <label class="form-label">Quantidade máxima</label>
+                                                                <input
+                                                                    type="number"
+                                                                    name="options[{{ $index }}][choices][{{ $choiceIndex }}][maxQuantity]"
+                                                                    class="form-control"
+                                                                    min="1"
+                                                                    value="{{ $choice['maxQuantity'] ?? 1 }}"
+                                                                >
+                                                            </div>
+
+                                                            <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
+                                                                <div class="form-check">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        name="options[{{ $index }}][choices][{{ $choiceIndex }}][default]"
+                                                                        value="1"
+                                                                        class="form-check-input"
+                                                                        {{ !empty($choice['default']) ? 'checked' : '' }}
+                                                                    >
+                                                                    <label class="form-check-label">Pré-selecionada</label>
+                                                                </div>
+
+                                                                <div class="form-check">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        name="options[{{ $index }}][choices][{{ $choiceIndex }}][isRecommended]"
+                                                                        value="1"
+                                                                        class="form-check-input"
+                                                                        {{ !empty($choice['isRecommended']) ? 'checked' : '' }}
+                                                                    >
+                                                                    <label class="form-check-label">Recomendada</label>
+                                                                </div>
+
+                                                                <button
+                                                                    type="button"
+                                                                    class="btn btn-sm btn-outline-danger remove-choice ms-auto"
+                                                                >
+                                                                    Remover escolha
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
 
                                             <small class="text-muted">
-                                                Informe as escolhas em JSON. Cada escolha pode ter name, price, default, description, maxQuantity, category e isRecommended.
+                                                Adicione cada opção que o cliente poderá escolher. Deixe o preço em branco ou use R$ 0,00 se não houver cobrança extra.
                                             </small>
                                         </div>
 
@@ -749,6 +870,50 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const tabs = Array.from(document.querySelectorAll('#productTabs .nav-link'));
+    const productForm = document.getElementById('productForm');
+
+    function formatMoney(value) {
+        const digits = String(value ?? '').replace(/\D/g, '');
+
+        if (!digits) return '';
+
+        const padded = digits.padStart(3, '0');
+        const whole = padded
+            .slice(0, -2)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        return `${whole},${padded.slice(-2)}`;
+    }
+
+    function formatMoneyInput(input) {
+        const cursor = input.selectionStart;
+        const digitsBeforeCursor = input.value
+            .slice(0, cursor)
+            .replace(/\D/g, '')
+            .length;
+
+        input.value = formatMoney(input.value);
+
+        let nextCursor = 0;
+        let digitsFound = 0;
+
+        while (nextCursor < input.value.length && digitsFound < digitsBeforeCursor) {
+            if (/\d/.test(input.value[nextCursor])) digitsFound++;
+            nextCursor++;
+        }
+
+        input.setSelectionRange(nextCursor, nextCursor);
+    }
+
+    document.querySelectorAll('.money-mask').forEach(input => {
+        input.value = formatMoney(input.value);
+    });
+
+    document.addEventListener('input', event => {
+        if (event.target.matches('.money-mask')) {
+            formatMoneyInput(event.target);
+        }
+    });
 
     let currentTab = 0;
 
@@ -765,6 +930,16 @@ document.addEventListener('DOMContentLoaded', function () {
             pane.classList.toggle('active', i === index);
         });
     }
+
+    productForm.addEventListener('invalid', event => {
+        const pane = event.target.closest('.tab-pane');
+
+        if (!pane) return;
+
+        const index = tabs.findIndex(tab => tab.dataset.bsTarget === `#${pane.id}`);
+
+        if (index !== -1) showTab(index);
+    }, true);
 
     tabs.forEach((tab, index) => {
         tab.addEventListener('click', () => showTab(index));
@@ -783,12 +958,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const type = document.querySelector('[name="product_type"]:checked')?.value;
 
         const isCombo = type === 'combo';
+        const individualSection = document.getElementById('normalProductOptions');
+        const comboSection = document.getElementById('comboComposition');
 
-        document.getElementById('normalProductOptions').style.display =
-            isCombo ? 'none' : 'block';
+        individualSection.style.display = isCombo ? 'none' : 'block';
+        individualSection.querySelectorAll('input, select, textarea, button')
+            .forEach(control => control.disabled = isCombo);
 
-        document.getElementById('comboComposition').style.display =
-            isCombo ? 'block' : 'none';
+        comboSection.style.display = isCombo ? 'block' : 'none';
+        comboSection.querySelectorAll('input, select, textarea, button')
+            .forEach(control => control.disabled = !isCombo);
     }
 
     document.querySelectorAll('[name="product_type"]').forEach(input => {
@@ -798,9 +977,88 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleProductType();
 
     // Geradores de índices
-    let optionIndex = {{ count($options) }};
+    let optionIndex = {{ empty($options) ? 0 : max(array_map('intval', array_keys($options))) + 1 }};
     let comboItemIndex = {{ count($comboItems) }};
     let addonIndex = {{ count($comboAddons) }};
+
+    function createChoiceRow(option, choice) {
+        const choiceId = window.crypto?.randomUUID
+            ? window.crypto.randomUUID()
+            : `choice-${Date.now()}-${option}-${choice}`;
+
+        return `
+            <div class="border rounded p-3 mb-2 choice-row" data-choice-index="${choice}">
+                <input type="hidden" name="options[${option}][choices][${choice}][id]" value="${choiceId}">
+                <div class="row align-items-end">
+                    <div class="col-md-5 mb-2">
+                        <label class="form-label">Nome da escolha</label>
+                        <input type="text" name="options[${option}][choices][${choice}][name]" class="form-control" placeholder="Ex.: Grande" required>
+                    </div>
+
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Preço adicional</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="text" name="options[${option}][choices][${choice}][price]" class="form-control money-mask" placeholder="0,00" inputmode="decimal">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Categoria (opcional)</label>
+                        <input type="text" name="options[${option}][choices][${choice}][category]" class="form-control" placeholder="Ex.: acompanhamentos">
+                    </div>
+
+                    <div class="col-md-8 mb-2">
+                        <label class="form-label">Descrição (opcional)</label>
+                        <input type="text" name="options[${option}][choices][${choice}][description]" class="form-control" placeholder="Detalhes desta escolha">
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Quantidade máxima</label>
+                        <input type="number" name="options[${option}][choices][${choice}][maxQuantity]" class="form-control" min="1" value="1">
+                    </div>
+
+                    <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
+                        <div class="form-check">
+                            <input type="checkbox" name="options[${option}][choices][${choice}][default]" value="1" class="form-check-input">
+                            <label class="form-check-label">Pré-selecionada</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="options[${option}][choices][${choice}][isRecommended]" value="1" class="form-check-input">
+                            <label class="form-check-label">Recomendada</label>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-choice ms-auto">
+                            Remover escolha
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    document.addEventListener('click', event => {
+        const addChoiceButton = event.target.closest('.add-choice');
+
+        if (addChoiceButton) {
+            const optionCard = addChoiceButton.closest('.option-card');
+            const choicesContainer = optionCard.querySelector('.choices-container');
+            const indexes = Array.from(choicesContainer.querySelectorAll('.choice-row'))
+                .map(row => Number(row.dataset.choiceIndex));
+            const choiceIndex = indexes.length ? Math.max(...indexes) + 1 : 0;
+
+            choicesContainer.insertAdjacentHTML(
+                'beforeend',
+                createChoiceRow(addChoiceButton.dataset.optionIndex, choiceIndex)
+            );
+            return;
+        }
+
+        const removeChoiceButton = event.target.closest('.remove-choice');
+
+        if (removeChoiceButton) {
+            removeChoiceButton.closest('.choice-row').remove();
+        }
+    });
 
     // Adicionar opção
     document.getElementById('addOption').addEventListener('click', function () {
@@ -830,8 +1088,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label">Escolhas em JSON</label>
-                            <textarea name="options[${index}][choices]" class="form-control choices-json" rows="4">[]</textarea>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Escolhas disponíveis</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary add-choice" data-option-index="${index}">
+                                    <i class="mdi mdi-plus"></i>
+                                    Adicionar escolha
+                                </button>
+                            </div>
+                            <div class="choices-container"></div>
+                            <small class="text-muted">
+                                Adicione cada opção que o cliente poderá escolher. Deixe o preço em branco ou use R$ 0,00 se não houver cobrança extra.
+                            </small>
                         </div>
 
                         <div class="col-12 mt-3">
@@ -985,16 +1252,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     renderTags();
 
-    // Validação dos campos JSON antes do envio
-    document.getElementById('productForm').addEventListener('submit', function (event) {
+    productForm.addEventListener('submit', function () {
+        productForm.querySelectorAll('.money-mask').forEach(input => {
+            const digits = input.value.replace(/\D/g, '');
 
-        const visibleComposition = document.querySelector('[name="product_type"]:checked')?.value;
+            if (!digits) {
+                input.value = '';
+                return;
+            }
 
-        if (visibleComposition !== 'combo') {
-            return;
-        }
-
-        // A composição de combo é validada no backend também.
+            const padded = digits.padStart(3, '0');
+            input.value = `${padded.slice(0, -2)}.${padded.slice(-2)}`;
+        });
     });
 
 });
