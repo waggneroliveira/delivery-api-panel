@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -65,6 +66,20 @@ class Product extends Model
 
     public function galleries(){
         return $this->hasMany(ProductGallery::class);
+    }
+    public function comboItems(): HasMany
+    {
+        return $this->hasMany(ComboItem::class);
+    }
+
+    public function options(): HasMany
+    {
+        return $this->hasMany(Option::class);
+    }
+
+    public function comboAddons(): HasMany
+    {
+        return $this->hasMany(ComboAddon::class);
     }
     public function scopeActive($query){
         return $query->where('active', 1);
