@@ -11,6 +11,7 @@ use App\Models\ServiceSection;
 use App\Repositories\SettingThemeRepository;
 use App\Services\ThemeManager;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +22,12 @@ use Intervention\Image\ImageManager;
 
 class ProductService
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Upload
+    |--------------------------------------------------------------------------
+    */
+
     protected function getPathUpload(): string
     {
         $themeManager = app(ThemeManager::class);
@@ -31,250 +38,42 @@ class ProductService
         return "admin/uploads/images/templates/{$template}/{$variation}/product/";
     }
 
-    public function getIndexData(Request $request, ThemeManager $themeManager): array
+    /**
+     * Converte valores monetários para o formato decimal.
+     */
+    private function normalizePrice($value): string
     {
-        $settingTheme = (new SettingThemeRepository())->settingTheme();
-        $check = checkPermission('products', 'produtos.visualizar', $settingTheme);
-        if ($check !== true) {
-            return ['forbidden' => $check];
-        }
-        $serviceSection = ServiceSection::whereIn('section', ['product'])
-        ->get()
-        ->keyBy('section');
-
-        $categories = ProductCategory::active()->sorting()->get();
-        $productsQuery = Product::with(['category']);
-
-        if ($request->filled('title')) {
-            $productsQuery->where('title', 'like', '%' . $request->title . '%');
+        if ($value === null || $value === '') {
+            return '0.00';
         }
 
-        if ($request->filled('product_category_id')) {
-            $productsQuery->where('product_category_id', $request->product_category_id);
-        }
-
-        $products = $productsQuery->sorting()->paginate(60)->withQueryString();
-        $productCategory = [];
-        foreach ($categories as $category) {
-            $productCategory[$category->id] = $category->title;
-        }
-        $theme = $themeManager;
-        $themeData = $themeManager->theme();
-        return compact('products', 'categories', 'productCategory', 'theme', 'themeData', 'settingTheme', 'serviceSection');
-    }
-
-    public function getCreateData(ThemeManager $themeManager): array
-    {
-        $settingTheme = (new SettingThemeRepository())->settingTheme();
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        if (!$user->hasRole('Super') && !$user->can('usuario.tornar usuario master') && !($user->hasPermissionTo('produtos.visualizar') && $user->hasPermissionTo('produtos.criar'))) {
-            return ['forbidden' => view('admin.error.403', compact('settingTheme'))];
-        }
-
-        $categories = ProductCategory::active()->sorting()->get();
-        $brands = Brand::active()->sorting()->get();
-        $productCategory = [];
-        foreach ($categories as $category) {
-            $productCategory[$category->id] = $category->title;
-        }
-        $productBrand = [];
-        foreach ($brands as $brand) {
-            $productBrand[$brand->id] = $brand->title;
-        }
-        $theme = $themeManager;
-        $themeData = $themeManager->theme();
-        return compact('categories', 'productCategory', 'productBrand', 'theme', 'themeData');
-    }
-
-    public function getEditData(Product $product, ThemeManager $themeManager): array
-    {
-        $settingTheme = (new SettingThemeRepository())->settingTheme();
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        if (!$user->hasRole('Super') && !$user->can('usuario.tornar usuario master') && !($user->hasPermissionTo('produtos.visualizar') && $user->hasPermissionTo('produtos.editar'))) {
-            return ['forbidden' => view('admin.error.403', compact('settingTheme'))];
-        }
-
-        $product = $product->with(['galleries' => function ($query) {
-            $query->orderBy('sorting', 'ASC');
-        }])->find($product->id);
-
-        $categories = ProductCategory::active()->sorting()->get();
-        $brands = Brand::active()->sorting()->get();
-        $productCategory = [];
-        foreach ($categories as $category) {
-            $productCategory[$category->id] = $category->title;
-        }
-        $productBrand = [];
-        foreach ($brands as $brand) {
-            $productBrand[$brand->id] = $brand->title;
-        }
-        $theme = $themeManager;
-        $themeData = $themeManager->theme();
-        return compact('product', 'categories', 'productCategory', 'productBrand', 'theme', 'themeData');
-    }
-
-    public function store(ProductStoreRequest $request): Product
-    {
-        $data = $request->all();
-
-        $data['active'] = $request->active ? 1 : 0;
-        $data['slug'] = Str::slug($request->title);
-
-        // Formata o campo price
-        $valorFormatado = $request->price;
-
-        $valorNumerico = str_replace(
+        $value = str_replace(
             ['R$', ' ', "\u{A0}"],
             '',
-            $valorFormatado
+            (string) $value
         );
 
-        $valorNumerico = str_replace(',', '.', $valorNumerico);
-
-        $data['price'] = floatval($valorNumerico);
-
-        // Sizes
-        if (isset($data['sizes'])) {
-            $sizes = array_values(
-                array_filter(
-                    $request->sizes,
-                    function ($size) {
-                        return !is_null($size) && trim($size) !== '';
-                    }
-                )
-            );
-
-            $data['sizes'] = !empty($sizes)
-                ? json_encode($sizes)
-                : json_encode([]);
-        } else {
-            $data['sizes'] = null;
+        // Formato brasileiro: 1.234,56
+        if (str_contains($value, ',')) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
         }
 
-        $pathUpload = $this->getPathUpload();
-
-        $manager = new ImageManager(new ImagickDriver());
-
-        /*
-        |--------------------------------------------------------------------------
-        | Imagem do produto
-        |--------------------------------------------------------------------------
-        */
-        if ($request->hasFile('path_image')) {
-            $file = $request->file('path_image');
-            $mime = $file->getMimeType();
-
-            if ($mime === 'image/svg+xml') {
-                $filename = Str::uuid() . '.svg';
-
-                Storage::disk('public')->putFileAs(
-                    $pathUpload,
-                    $file,
-                    $filename
-                );
-            } else {
-                $filename = Str::uuid() . '.avif';
-
-                $image = $manager
-                    ->read($file)
-                    ->toAvif(quality: 90)
-                    ->toString();
-
-                Storage::disk('public')->put(
-                    $pathUpload . $filename,
-                    $image
-                );
-            }
-
-            $data['path_image'] = $pathUpload . $filename;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Arquivo / imagem
-        |--------------------------------------------------------------------------
-        */
-        if ($request->hasFile('path_file')) {
-            $file = $request->file('path_file');
-            $mime = $file->getMimeType();
-
-            // SVG
-            if ($mime === 'image/svg+xml') {
-                $filename = Str::uuid() . '.svg';
-
-                Storage::disk('public')->putFileAs(
-                    $pathUpload,
-                    $file,
-                    $filename
-                );
-            }
-            // Qualquer imagem
-            elseif (str_starts_with($mime, 'image/')) {
-                $filename = Str::uuid() . '.avif';
-
-                $image = $manager
-                    ->read($file)
-                    ->toAvif(quality: 90)
-                    ->toString();
-
-                Storage::disk('public')->put(
-                    $pathUpload . $filename,
-                    $image
-                );
-            }
-            // Outros arquivos
-            else {
-                $extension = $file->getClientOriginalExtension();
-                $filename = Str::uuid() . '.' . $extension;
-
-                Storage::disk('public')->putFileAs(
-                    $pathUpload,
-                    $file,
-                    $filename
-                );
-            }
-
-            $data['path_file'] = $pathUpload . $filename;
-        }
-
-        DB::beginTransaction();
-
-        try {
-            $product = Product::create($data);
-
-            DB::commit();
-
-            return $product;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            throw $e;
-        }
+        return number_format((float) $value, 2, '.', '');
     }
 
-    public function uploadImageCkeditor(Request $request): array
-    {
-        if (!$request->hasFile('upload')) {
-        return [
-            'uploaded' => 0,
-            'error' => ['message' => 'Upload falhou.'],
-        ];
-        }
-
-        $file = $request->file('upload');
-
+    /**
+     * Salva uma imagem ou arquivo.
+     */
+    private function storeUploadedFile(
+        UploadedFile $file,
+        string $pathUpload,
+        ImageManager $manager
+    ): string {
         $mime = $file->getMimeType();
 
-        $pathUpload = $this->getPathUpload();
-
-        $manager = new ImageManager(new ImagickDriver());
-
+        // SVG é armazenado sem conversão
         if ($mime === 'image/svg+xml') {
-
             $filename = Str::uuid() . '.svg';
 
             Storage::disk('public')->putFileAs(
@@ -283,8 +82,11 @@ class ProductService
                 $filename
             );
 
-        } else {
+            return $pathUpload . $filename;
+        }
 
+        // Imagens são convertidas para AVIF
+        if (str_starts_with($mime, 'image/')) {
             $filename = Str::uuid() . '.avif';
 
             $image = $manager
@@ -296,54 +98,55 @@ class ProductService
                 $pathUpload . $filename,
                 $image
             );
+
+            return $pathUpload . $filename;
         }
 
-        return [
-            'uploaded' => 1,
+        // Outros arquivos mantêm a extensão original
+        $extension = $file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . $extension;
 
-            'fileName' => $filename,
-
-            'url' => asset(
-                'storage/' . $pathUpload . $filename
-            ),
-        ];
-
-    }
-
-    public function update(ProductUpdateRequest $request, Product $product): Product
-    {
-        $data = $request->all();
-
-        $data['active'] = $request->active ? 1 : 0;
-        $data['slug'] = Str::slug($request->title);
-
-        // Formata o campo price
-        $valorFormatado = $request->price;
-
-        $valorNumerico = str_replace(
-            ['R$', ' ', "\u{A0}"],
-            '',
-            $valorFormatado
+        Storage::disk('public')->putFileAs(
+            $pathUpload,
+            $file,
+            $filename
         );
 
-        $valorNumerico = str_replace(',', '.', $valorNumerico);
+        return $pathUpload . $filename;
+    }
 
-        $data['price'] = floatval($valorNumerico);
+    /**
+     * Prepara os dados principais do produto.
+     */
+    private function prepareProductData(
+        Request $request,
+        array $data,
+        ?Product $product = null,
+        array &$newFiles = [],
+        array &$oldFiles = []
+    ): array {
+        $data['active'] = $request->boolean('active');
 
-        // Sizes
-        if (isset($data['sizes'])) {
+        if (!empty($request->title)) {
+            $data['slug'] = Str::slug($request->title);
+        }
+
+        if (isset($data['price'])) {
+            $data['price'] = $this->normalizePrice($data['price']);
+        }
+
+        // Mantém compatibilidade com o campo antigo sizes.
+        // Quando a estrutura nova estiver totalmente implantada,
+        // esse tratamento poderá ser removido.
+        if (array_key_exists('sizes', $data)) {
             $sizes = array_values(
                 array_filter(
-                    $request->sizes,
-                    function ($size) {
-                        return !is_null($size) && trim($size) !== '';
-                    }
+                    $data['sizes'] ?? [],
+                    fn ($size) => !is_null($size) && trim($size) !== ''
                 )
             );
 
-            $data['sizes'] = !empty($sizes)
-                ? json_encode($sizes)
-                : json_encode([]);
+            $data['sizes'] = json_encode($sizes);
         } else {
             $data['sizes'] = null;
         }
@@ -357,195 +160,685 @@ class ProductService
         | Imagem do produto
         |--------------------------------------------------------------------------
         */
+
         if ($request->hasFile('path_image')) {
-            $file = $request->file('path_image');
-            $mime = $file->getMimeType();
+            $path = $this->storeUploadedFile(
+                $request->file('path_image'),
+                $pathUpload,
+                $manager
+            );
 
-            if ($mime === 'image/svg+xml') {
-                $filename = Str::uuid() . '.svg';
+            $data['path_image'] = $path;
+            $newFiles[] = $path;
 
-                Storage::disk('public')->putFileAs(
-                    $pathUpload,
-                    $file,
-                    $filename
-                );
-            } else {
-                $filename = Str::uuid() . '.avif';
-
-                $image = $manager
-                    ->read($file)
-                    ->toAvif(quality: 90)
-                    ->toString();
-
-                Storage::disk('public')->put(
-                    $pathUpload . $filename,
-                    $image
-                );
+            if ($product && $product->path_image) {
+                $oldFiles[] = $product->path_image;
             }
-
-            if (!empty($product->path_image)) {
-                Storage::disk('public')->delete(
-                    $product->path_image
-                );
-            }
-
-            $data['path_image'] = $pathUpload . $filename;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Remover imagem do produto
-        |--------------------------------------------------------------------------
-        */
-        if (
-            $request->has('delete_path_image') &&
-            !$request->hasFile('path_image')
+        } elseif (
+            $product &&
+            $request->has('delete_path_image')
         ) {
-            if (!empty($product->path_image)) {
-                Storage::disk('public')->delete(
-                    $product->path_image
-                );
-            }
-
             $data['path_image'] = null;
+
+            if ($product->path_image) {
+                $oldFiles[] = $product->path_image;
+            }
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Arquivo / imagem
+        | Arquivo do produto
         |--------------------------------------------------------------------------
         */
+
         if ($request->hasFile('path_file')) {
-            $file = $request->file('path_file');
-            $mime = $file->getMimeType();
+            $path = $this->storeUploadedFile(
+                $request->file('path_file'),
+                $pathUpload,
+                $manager
+            );
 
-            /*
-            * Se for SVG, mantém SVG.
-            */
-            if ($mime === 'image/svg+xml') {
-                $filename = Str::uuid() . '.svg';
+            $data['path_file'] = $path;
+            $newFiles[] = $path;
 
-                Storage::disk('public')->putFileAs(
-                    $pathUpload,
-                    $file,
-                    $filename
-                );
+            if ($product && $product->path_file) {
+                $oldFiles[] = $product->path_file;
             }
-            /*
-            * Se for imagem, converte para AVIF.
-            */
-            elseif (str_starts_with($mime, 'image/')) {
-                $filename = Str::uuid() . '.avif';
+        } elseif (
+            $product &&
+            $request->has('delete_path_file')
+        ) {
+            $data['path_file'] = null;
 
-                $image = $manager
-                    ->read($file)
-                    ->toAvif(quality: 90)
-                    ->toString();
-
-                Storage::disk('public')->put(
-                    $pathUpload . $filename,
-                    $image
-                );
+            if ($product->path_file) {
+                $oldFiles[] = $product->path_file;
             }
-            /*
-            * Se não for imagem, mantém o arquivo original.
-            */
-            else {
-                $extension = $file->getClientOriginalExtension();
-                $filename = Str::uuid() . '.' . $extension;
+        }
 
-                Storage::disk('public')->putFileAs(
-                    $pathUpload,
-                    $file,
-                    $filename
-                );
+        // Os arquivos não devem ser enviados como atributos do Model.
+        unset(
+            $data['delete_path_image'],
+            $data['delete_path_file']
+        );
+
+        return $data;
+    }
+
+    /**
+     * Remove arquivos antigos somente depois de salvar o registro.
+     */
+    private function deleteOldFiles(array $files): void
+    {
+        foreach (array_unique($files) as $file) {
+            if ($file) {
+                Storage::disk('public')->delete($file);
+            }
+        }
+    }
+
+    /**
+     * Remove arquivos recém-criados em caso de falha.
+     */
+    private function cleanupNewFiles(array $files): void
+    {
+        foreach ($files as $file) {
+            if ($file) {
+                Storage::disk('public')->delete($file);
+            }
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Composição do produto
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Separa os dados das tabelas relacionadas ao produto.
+     */
+    private function extractComposition(array &$data): array
+    {
+        $composition = [];
+
+        $fields = [
+            'options',
+            'combo_items',
+            'combo_addons',
+        ];
+
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $data)) {
+                $composition[$field] = $data[$field] ?? [];
             }
 
-            // Remove arquivo anterior
-            if (!empty($product->path_file)) {
-                Storage::disk('public')->delete(
-                    $product->path_file
-                );
+            unset($data[$field]);
+        }
+
+        return $composition;
+    }
+
+    /**
+     * Sincroniza as opções e a composição do produto.
+     */
+    private function syncComposition(
+        Product $product,
+        array $composition,
+        bool $creating = false
+    ): void {
+        $isCombo = $product->product_type === 'combo';
+
+        /*
+        |--------------------------------------------------------------------------
+        | Produto normal
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$isCombo) {
+            // Remove composição anterior de combo, se houver.
+            $product->comboItems()->delete();
+            $product->comboAddons()->delete();
+
+            // Atualiza as opções somente se foram enviadas.
+            if (
+                $creating ||
+                array_key_exists('options', $composition)
+            ) {
+                $product->options()->delete();
+
+                $options = $composition['options'] ?? [];
+
+                $this->createOptions($product, $options);
             }
 
-            $data['path_file'] = $pathUpload . $filename;
+            return;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Remover arquivo / imagem
+        | Produto combo
         |--------------------------------------------------------------------------
         */
+
+        // Combo não utiliza opções diretamente no produto.
+        $product->options()->delete();
+
+        // Sincroniza os itens do combo.
         if (
-            $request->has('delete_path_file') &&
-            !$request->hasFile('path_file')
+            $creating ||
+            array_key_exists('combo_items', $composition)
         ) {
-            if (!empty($product->path_file)) {
-                Storage::disk('public')->delete(
-                    $product->path_file
+            $product->comboItems()->delete();
+
+            $items = $composition['combo_items'] ?? [];
+
+            $this->createComboItems($product, $items);
+        }
+
+        // Sincroniza os adicionais do combo.
+        if (
+            $creating ||
+            array_key_exists('combo_addons', $composition)
+        ) {
+            $product->comboAddons()->delete();
+
+            $addons = $composition['combo_addons'] ?? [];
+
+            $this->createComboAddons($product, $addons);
+        }
+    }
+
+    /**
+     * Cria opções diretamente vinculadas ao produto.
+     */
+    private function createOptions(
+        Product $product,
+        array $options
+    ): void {
+        foreach ($options as $optionData) {
+            unset(
+                $optionData['id'],
+                $optionData['tenant_id'],
+                $optionData['product_id'],
+                $optionData['combo_item_id']
+            );
+
+            $product->options()->create($optionData);
+        }
+    }
+
+    /**
+     * Cria os itens do combo e suas respectivas opções.
+     */
+    private function createComboItems(
+        Product $product,
+        array $items
+    ): void {
+        foreach ($items as $itemData) {
+            $options = $itemData['options'] ?? [];
+
+            unset(
+                $itemData['id'],
+                $itemData['options'],
+                $itemData['tenant_id'],
+                $itemData['product_id']
+            );
+
+            // Cria o item pertencente ao combo.
+            $comboItem = $product->comboItems()->create($itemData);
+
+            // Cria as opções disponíveis para esse item.
+            foreach ($options as $optionData) {
+                unset(
+                    $optionData['id'],
+                    $optionData['tenant_id'],
+                    $optionData['product_id'],
+                    $optionData['combo_item_id']
+                );
+
+                $comboItem->options()->create($optionData);
+            }
+        }
+    }
+
+    /**
+     * Cria os adicionais do combo.
+     */
+    private function createComboAddons(
+        Product $product,
+        array $addons
+    ): void {
+        foreach ($addons as $addonData) {
+            unset(
+                $addonData['id'],
+                $addonData['tenant_id'],
+                $addonData['product_id']
+            );
+
+            if (isset($addonData['price'])) {
+                $addonData['price'] = $this->normalizePrice(
+                    $addonData['price']
                 );
             }
 
-            $data['path_file'] = null;
+            $product->comboAddons()->create($addonData);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Listagem
+    |--------------------------------------------------------------------------
+    */
+
+    public function getIndexData(
+        Request $request,
+        ThemeManager $themeManager
+    ): array {
+        $settingTheme = (new SettingThemeRepository())->settingTheme();
+
+        $check = checkPermission(
+            'products',
+            'produtos.visualizar',
+            $settingTheme
+        );
+
+        if ($check !== true) {
+            return ['forbidden' => $check];
         }
 
-        DB::beginTransaction();
+        $serviceSection = ServiceSection::whereIn(
+            'section',
+            ['product']
+        )
+            ->get()
+            ->keyBy('section');
+
+        $categories = ProductCategory::active()
+            ->sorting()
+            ->get();
+
+        $productsQuery = Product::with(['category']);
+
+        if ($request->filled('title')) {
+            $productsQuery->where(
+                'title',
+                'like',
+                '%' . $request->title . '%'
+            );
+        }
+
+        if ($request->filled('product_category_id')) {
+            $productsQuery->where(
+                'product_category_id',
+                $request->product_category_id
+            );
+        }
+
+        $products = $productsQuery
+            ->sorting()
+            ->paginate(60)
+            ->withQueryString();
+
+        $productCategory = [];
+
+        foreach ($categories as $category) {
+            $productCategory[$category->id] = $category->title;
+        }
+
+        $theme = $themeManager;
+        $themeData = $themeManager->theme();
+
+        return compact(
+            'products',
+            'categories',
+            'productCategory',
+            'theme',
+            'themeData',
+            'settingTheme',
+            'serviceSection'
+        );
+    }
+
+
+    public function getCreateData(ThemeManager $themeManager): array
+    {
+        $settingTheme = (new SettingThemeRepository())->settingTheme();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if (
+            !$user->hasRole('Super') &&
+            !$user->can('usuario.tornar usuario master') &&
+            !(
+                $user->hasPermissionTo('produtos.visualizar') &&
+                $user->hasPermissionTo('produtos.criar')
+            )
+        ) {
+            return [
+                'forbidden' => view(
+                    'admin.error.403',
+                    compact('settingTheme')
+                ),
+            ];
+        }
+
+        $categories = ProductCategory::active()
+            ->sorting()
+            ->get();
+
+        $brands = Brand::active()
+            ->sorting()
+            ->get();
+
+        $theme = $themeManager;
+        $themeData = $themeManager->theme();
+
+        return [
+            'categories' => $categories,
+            'brands' => $brands,
+
+            'productCategory' => $categories->pluck('title', 'id')->toArray(),
+            'productBrand' => $brands->pluck('title', 'id')->toArray(),
+
+            'theme' => $theme,
+            'themeData' => $themeData,
+            'settingTheme' => $settingTheme,
+        ];
+    }
+
+    public function getEditData(
+        Product $product,
+        ThemeManager $themeManager
+    ): array {
+        $settingTheme = (new SettingThemeRepository())->settingTheme();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if (
+            !$user->hasRole('Super') &&
+            !$user->can('usuario.tornar usuario master') &&
+            !(
+                $user->hasPermissionTo('produtos.visualizar') &&
+                $user->hasPermissionTo('produtos.editar')
+            )
+        ) {
+            return [
+                'forbidden' => view(
+                    'admin.error.403',
+                    compact('settingTheme')
+                ),
+            ];
+        }
+
+        // Carrega os relacionamentos necessários para a edição.
+        $product->load([
+            'category',
+            'brand',
+            'galleries',
+            'options',
+            'comboItems.options',
+            'comboAddons',
+        ]);
+
+        $categories = ProductCategory::active()
+            ->sorting()
+            ->get();
+
+        $brands = Brand::active()
+            ->sorting()
+            ->get();
+
+        $theme = $themeManager;
+        $themeData = $themeManager->theme();
+
+        return [
+            'product' => $product,
+
+            'categories' => $categories,
+            'brands' => $brands,
+
+            'productCategory' => $categories->pluck('title', 'id')->toArray(),
+            'productBrand' => $brands->pluck('title', 'id')->toArray(),
+
+            'theme' => $theme,
+            'themeData' => $themeData,
+            'settingTheme' => $settingTheme,
+        ];
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Store
+    |--------------------------------------------------------------------------
+    */
+
+    public function store(ProductStoreRequest $request): Product
+    {
+        $data = $request->all();
+
+        // Separa os dados das tabelas relacionadas.
+        $composition = $this->extractComposition($data);
+
+        $newFiles = [];
+        $oldFiles = [];
+
+        // Prepara os dados do produto principal.
+        $data = $this->prepareProductData(
+            $request,
+            $data,
+            null,
+            $newFiles,
+            $oldFiles
+        );
 
         try {
-            $product->fill($data)->save();
+            $product = DB::transaction(function () use (
+                $data,
+                $composition
+            ) {
+                // Cria o produto principal.
+                $product = Product::create($data);
 
-            DB::commit();
+                // Cria as variantes e a composição.
+                $this->syncComposition(
+                    $product,
+                    $composition,
+                    true
+                );
 
-            return $product;
-        } catch (\Exception $e) {
-            DB::rollBack();
+                return $product;
+            });
+
+            return $product->load([
+                'options',
+                'comboItems.options',
+                'comboAddons',
+            ]);
+        } catch (\Throwable $e) {
+            // Evita deixar arquivos órfãos se o cadastro falhar.
+            $this->cleanupNewFiles($newFiles);
 
             throw $e;
         }
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Upload CKEditor
+    |--------------------------------------------------------------------------
+    */
+
+    public function uploadImageCkeditor(Request $request): array
+    {
+        if (!$request->hasFile('upload')) {
+            return [
+                'uploaded' => 0,
+                'error' => [
+                    'message' => 'Upload falhou.',
+                ],
+            ];
+        }
+
+        $file = $request->file('upload');
+
+        $pathUpload = $this->getPathUpload();
+
+        $manager = new ImageManager(new ImagickDriver());
+
+        $path = $this->storeUploadedFile(
+            $file,
+            $pathUpload,
+            $manager
+        );
+
+        $filename = basename($path);
+
+        return [
+            'uploaded' => 1,
+            'fileName' => $filename,
+            'url' => asset('storage/' . $path),
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update
+    |--------------------------------------------------------------------------
+    */
+
+    public function update(
+        ProductUpdateRequest $request,
+        Product $product
+    ): Product {
+        $data = $request->all();
+
+        // Separa os dados das tabelas relacionadas.
+        $composition = $this->extractComposition($data);
+
+        $newFiles = [];
+        $oldFiles = [];
+
+        // Prepara os dados do produto principal.
+        $data = $this->prepareProductData(
+            $request,
+            $data,
+            $product,
+            $newFiles,
+            $oldFiles
+        );
+
+        try {
+            $product = DB::transaction(function () use (
+                $product,
+                $data,
+                $composition
+            ) {
+                // Atualiza o produto principal.
+                $product->fill($data)->save();
+
+                // Atualiza as variantes e a composição.
+                $this->syncComposition(
+                    $product,
+                    $composition
+                );
+
+                return $product;
+            });
+
+            // Remove os arquivos anteriores após o commit.
+            $this->deleteOldFiles($oldFiles);
+
+            return $product->load([
+                'options',
+                'comboItems.options',
+                'comboAddons',
+            ]);
+        } catch (\Throwable $e) {
+            // Remove somente os arquivos novos em caso de falha.
+            $this->cleanupNewFiles($newFiles);
+
+            throw $e;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exclusão
+    |--------------------------------------------------------------------------
+    */
+
     public function delete(Product $product): void
     {
-        Storage::delete($product->path_image ?? '');
-        Storage::delete($product->path_file ?? '');
-        $product->delete();
+        DB::transaction(function () use ($product) {
+            $product->delete();
+        });
+
+        $this->deleteOldFiles([
+            $product->path_image,
+            $product->path_file,
+        ]);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exclusão múltipla
+    |--------------------------------------------------------------------------
+    */
 
     public function destroySelected(Request $request): array
     {
-        foreach ($request->deleteAll as $productId) {
-            $product = Product::find($productId);
+        $ids = $request->input('deleteAll', []);
 
-            if ($product) {
-                activity()
-                    ->causedBy(Auth::user())
-                    ->performedOn($product)
-                    ->event('multiple_deleted')
-                    ->withProperties([
-                        'attributes' => [
-                            'id' => $productId,
-                            'title' => $product->title,
-                            'slug' => $product->slug,
-                            'sizes' => $product->sizes,
-                            'description' => $product->description,
-                            'text' => $product->text,
-                            'path_image' => $product->path_image,
-                            'path_file' => $product->path_file,
-                            'active' => $product->active,
-                            'sorting' => $product->sorting,
-                            'event' => 'multiple_deleted',
-                        ],
-                    ])
-                    ->log('multiple_deleted');
-            } else {
-                Log::warning("Item com ID {$productId} não encontrado.");
-            }
+        $products = Product::whereIn('id', $ids)->get();
+
+        $files = [];
+
+        foreach ($products as $product) {
+            activity()
+                ->causedBy(Auth::user())
+                ->performedOn($product)
+                ->event('multiple_deleted')
+                ->withProperties([
+                    'attributes' => [
+                        'id' => $product->id,
+                        'title' => $product->title,
+                        'slug' => $product->slug,
+                        'sizes' => $product->sizes,
+                        'description' => $product->description,
+                        'text' => $product->text,
+                        'path_image' => $product->path_image,
+                        'path_file' => $product->path_file,
+                        'active' => $product->active,
+                        'sorting' => $product->sorting,
+                        'event' => 'multiple_deleted',
+                    ],
+                ])
+                ->log('multiple_deleted');
+
+            $files[] = $product->path_image;
+            $files[] = $product->path_file;
         }
 
-        $deleted = Product::whereIn('id', $request->deleteAll)->delete();
+        $deleted = DB::transaction(function () use ($ids) {
+            return Product::whereIn('id', $ids)->delete();
+        });
 
-        return ['deleted' => $deleted];
+        $this->deleteOldFiles($files);
+
+        return [
+            'deleted' => $deleted,
+        ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ordenação
+    |--------------------------------------------------------------------------
+    */
 
     public function sorting(Request $request): array
     {
@@ -580,6 +873,8 @@ class ProductService
             }
         }
 
-        return ['status' => 'success'];
+        return [
+            'status' => 'success',
+        ];
     }
 }
