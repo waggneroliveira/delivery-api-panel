@@ -45,7 +45,7 @@
             >
                 @csrf
 
-                @include('admin.modules.product.form')
+                @include("admin.templates.{$themeData->slug}.{$themeData->template_variation}.product.form")
 
                 <div class="d-flex justify-content-end gap-2 mt-4 mb-4">
                     <a
