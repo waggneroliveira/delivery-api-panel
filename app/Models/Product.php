@@ -15,7 +15,15 @@ class Product extends Model
     use Notifiable, HasFactory, LogsActivity, BelongsToTenant;
     
     protected $casts = [
-        'sizes' => 'array'
+        'sizes' => 'array',
+        'tags' => 'array',
+        'specifications' => 'array',
+        'stock' => 'array',
+        'price' => 'decimal:2',
+        'old_price' => 'decimal:2',
+        'cashback' => 'decimal:2',
+        'featured' => 'boolean',
+        'active' => 'boolean',
     ];
     
     protected $fillable = [
@@ -30,12 +38,22 @@ class Product extends Model
         'text',
         'path_image',
         'path_file',
-        'price',
+        
         'link',
         'btn_title',
         'active',
         'sorting',
         'link_type',
+
+        'price',
+        'old_price',
+        'cashback',
+        'product_type',
+        'cuisine_type',
+        'tags',
+        'specifications',
+        'stock',
+        'featured',
     ];
 
     public function category(){

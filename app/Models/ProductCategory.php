@@ -20,6 +20,7 @@ class ProductCategory extends Model
         'slug',
         'active',
         'highlight',
+        'description',
         'path_image',
         'sorting',
     ];

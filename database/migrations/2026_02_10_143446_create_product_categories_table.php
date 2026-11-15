@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained();
             $table->string('title');
             $table->string('slug');
+            $table->string('description')->nullable();
             $table->string('path_image')->nullable();
             $table->boolean('active')->default(0);
             $table->boolean('highlight')->default(0);
