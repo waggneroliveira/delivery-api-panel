@@ -524,7 +524,17 @@ class ClientApiTest extends TestCase
         $this->withToken($client->createToken('delivery')->plainTextToken)
             ->postJson('/api/client/orders', [
                 'items' => [
-                    ['product_id' => $productId, 'quantity' => 2],
+                    [
+                        'product_id' => $productId,
+                        'quantity' => 2,
+                        'unit_price' => 18.75,
+                        'details' => [
+                            'aditionals' => [
+                                ['name' => 'Bacon extra', 'price' => 3.00, 'quantity' => 2],
+                            ],
+                        ],
+                    ],
+                    ['product_id' => $productId, 'quantity' => 1],
                 ],
             ])
             ->assertCreated()
@@ -536,7 +546,21 @@ class ClientApiTest extends TestCase
             'client_id' => $client->id,
             'customer_name' => 'Ana Cliente',
             'customer_phone' => '11999999999',
-            'subtotal' => 25,
+            'subtotal' => 50,
+        ]);
+
+        $this->assertDatabaseHas('order_items', [
+            'product_id' => $productId,
+            'quantity' => 2,
+            'unit_price' => 18.75,
+            'total_price' => 37.5,
+        ]);
+
+        $this->assertDatabaseHas('order_items', [
+            'product_id' => $productId,
+            'quantity' => 1,
+            'unit_price' => 12.5,
+            'total_price' => 12.5,
         ]);
     }
 

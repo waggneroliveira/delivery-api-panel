@@ -82,6 +82,18 @@ class OrderController extends Controller
                 'min:1',
             ],
 
+            'items.*.unit_price' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
+            'items.*.price' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
             'items.*.details' => [
                 'nullable',
                 'array',
@@ -105,13 +117,9 @@ class OrderController extends Controller
 
                 $quantity = $item['quantity'];
 
-                /*
-                 * Ponto de integração do cálculo de preço.
-                 * Neste primeiro estágio, utiliza somente o preço-base.
-                 */
-                $unitPrice = $this->calculateUnitPrice($product);
+                $unitPrice = $this->resolveUnitPrice($product, $item);
 
-                $totalPrice = $unitPrice * $quantity;
+                $totalPrice = round($unitPrice * $quantity, 2);
 
                 $subtotal += $totalPrice;
 
@@ -228,16 +236,15 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Calcular preço unitário do produto.
-     *
-     * Nesta primeira etapa considera somente o preço-base.
-     * Posteriormente será integrado ao cálculo das opções,
-     * tamanhos, combos e adicionais.
-     */
-    private function calculateUnitPrice(Product $product): float
+    private function resolveUnitPrice(Product $product, array $item): float
     {
-        return (float) $product->price;
+        // The cart sends the finalized price with customizations; older clients send only product_id.
+        $submittedPrice = $item['unit_price'] ?? $item['price'] ?? null;
+
+        return round(
+            $submittedPrice !== null ? (float) $submittedPrice : (float) $product->price,
+            2
+        );
     }
 
     /**
