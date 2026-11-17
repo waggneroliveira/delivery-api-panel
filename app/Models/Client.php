@@ -7,6 +7,7 @@ use App\Services\ActivityLogService;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -47,6 +48,10 @@ class Client extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ClientResetPasswordNotification($token));
+    }
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     public function addresses()
