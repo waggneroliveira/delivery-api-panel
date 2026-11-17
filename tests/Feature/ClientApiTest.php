@@ -446,6 +446,100 @@ class ClientApiTest extends TestCase
             ->assertJson(['message' => 'Não autenticado.']);
     }
 
+    public function test_authenticated_client_can_place_order_without_resending_profile_details(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('tenant_id');
+            $table->boolean('active');
+            $table->string('title');
+            $table->string('slug')->nullable();
+            $table->string('path_image')->nullable();
+            $table->string('product_type')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->timestamps();
+        });
+
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('tenant_id');
+            $table->unsignedBigInteger('client_id');
+            $table->string('number');
+            $table->string('customer_name');
+            $table->string('customer_phone', 20);
+            $table->json('delivery_address')->nullable();
+            $table->string('status');
+            $table->string('payment_status');
+            $table->decimal('subtotal', 10, 2);
+            $table->decimal('delivery_fee', 10, 2);
+            $table->decimal('discount', 10, 2);
+            $table->decimal('total', 10, 2);
+            $table->text('notes')->nullable();
+            $table->timestamp('placed_at');
+            $table->timestamps();
+        });
+
+        Schema::create('order_items', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('tenant_id');
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->string('product_title');
+            $table->string('product_slug')->nullable();
+            $table->string('product_image')->nullable();
+            $table->string('product_type', 30)->nullable();
+            $table->unsignedInteger('quantity');
+            $table->decimal('unit_price', 10, 2);
+            $table->decimal('total_price', 10, 2);
+            $table->json('details')->nullable();
+            $table->timestamps();
+        });
+
+        $tenant = Tenant::create([
+            'name' => 'Delivery',
+            'slug' => 'delivery',
+            'domain' => 'localhost',
+            'active' => true,
+        ]);
+        $tenant->makeCurrent();
+
+        $client = Client::create([
+            'tenant_id' => $tenant->id,
+            'name' => 'Ana Cliente',
+            'phone' => '11999999999',
+            'email' => 'ana@example.com',
+            'password' => Hash::make('not-used-by-delivery-api'),
+            'active' => true,
+        ]);
+
+        $productId = DB::table('products')->insertGetId([
+            'tenant_id' => $tenant->id,
+            'active' => true,
+            'title' => 'Produto',
+            'price' => 12.50,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->withToken($client->createToken('delivery')->plainTextToken)
+            ->postJson('/api/client/orders', [
+                'items' => [
+                    ['product_id' => $productId, 'quantity' => 2],
+                ],
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.customer_name', 'Ana Cliente')
+            ->assertJsonPath('data.customer_phone', '11999999999')
+            ->assertJsonPath('data.client_id', $client->id);
+
+        $this->assertDatabaseHas('orders', [
+            'client_id' => $client->id,
+            'customer_name' => 'Ana Cliente',
+            'customer_phone' => '11999999999',
+            'subtotal' => 25,
+        ]);
+    }
+
     public function test_tenant_api_returns_public_branding_and_theme_configuration(): void
     {
         $tenant = Tenant::create([

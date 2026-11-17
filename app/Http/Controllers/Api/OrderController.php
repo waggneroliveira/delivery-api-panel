@@ -40,19 +40,9 @@ class OrderController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $client = $request->user();
+
         $validated = $request->validate([
-            'customer_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'customer_phone' => [
-                'required',
-                'string',
-                'max:20',
-            ],
-
             'delivery_address' => [
                 'nullable',
                 'array',
@@ -100,7 +90,7 @@ class OrderController extends Controller
 
         $tenant = Tenant::current();
 
-        $order = DB::transaction(function () use ($validated, $tenant) {
+        $order = DB::transaction(function () use ($validated, $tenant, $client) {
 
             $subtotal = 0;
 
@@ -156,8 +146,9 @@ class OrderController extends Controller
 
                 'number' => $this->generateOrderNumber($tenant->id),
 
-                'customer_name' => $validated['customer_name'],
-                'customer_phone' => $validated['customer_phone'],
+                'client_id' => $client->id,
+                'customer_name' => $client->name,
+                'customer_phone' => $client->phone,
 
                 'delivery_address' => $validated['delivery_address'] ?? null,
 
