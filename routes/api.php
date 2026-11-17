@@ -64,20 +64,20 @@ Route::middleware([EnsureApiJson::class, EnsureApiTenant::class])
 
         // Pedidos
         Route::prefix('orders')
-            ->name('api.client.orders.')
-            ->controller(OrderController::class)
-            ->group(function () {
+        ->name('api.client.orders.')
+        ->controller(OrderController::class)
+        ->group(function () {
 
-                Route::get('/', 'index')
-                    ->name('index');
+            Route::get('/', 'index')
+                ->name('index');
 
-                Route::post('/', 'store')
-                    ->name('store');
+            Route::post('/', 'store')
+                ->name('store');
 
-                Route::get('/{id}', 'show')
-                    ->name('show');
+            Route::get('/{id}', 'show')
+                ->name('show');
 
-            });
+        });
 
     });
 });
